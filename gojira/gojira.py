@@ -14,7 +14,7 @@ from batcave.commander import Argument, Commander
 # Import local modules
 from .utils import apt, apt_install, pip_install, pip_setup
 
-ACTIONS = ['test', 'build', 'deploy', 'rollback', 'pre_release', 'release']
+ACTIONS = ['test', 'build', 'deploy', 'rollback', 'pre_release', 'release', 'freeze']
 ENV_VARS = {'_BUILD_ARTIFACTS': 'artifacts',
             '_TEST_RESULTS': 'test_results',
             '_GCP_ARTIFACT_REGION': 'us',
