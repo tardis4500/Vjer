@@ -6,29 +6,26 @@ Since this program can be called before the requirements are install, it can onl
 # Import standard modules
 from importlib import import_module
 from os import getenv, putenv
-from sys import argv, exit as sys_exit, stderr, version as python_version
+from sys import exit as sys_exit, stderr, version as python_version
+
+# Import third-party modules
+from batcave.commander import Argument, Commander
 
 # Import local modules
 from .utils import apt, apt_install, pip_install, pip_setup
 
+ACTIONS = ['test', 'build', 'deploy', 'rollback', 'pre_release', 'release']
 ENV_VARS = {'_BUILD_ARTIFACTS': 'artifacts',
             '_TEST_RESULTS': 'test_results',
             '_GCP_ARTIFACT_REGION': 'us',
-            '_GCP_ARTIFACT_REPO': 'cysiv-deployment-pipeline',
-            '_DOCKER_REPO_NAME': 'gcr.io',
             '_DOCKER_REPO': '{_GCP_ARTIFACT_REGION}-docker.pkg.dev/{_GCP_ARTIFACT_REPO}/{_DOCKER_REPO_NAME}',
-            '_HELM_REPO_NAME': 'forescout-helm-repo',
             '_HELM_REPO': 'oci://{_GCP_ARTIFACT_REGION}-docker.pkg.dev/{_GCP_ARTIFACT_REPO}/{_HELM_REPO_NAME}'}
-
-ACTIONS = ['test', 'build', 'deploy', 'rollback', 'pre_release', 'release']
 
 
 def main() -> None:
     """The main entrypoint."""
-    if len(argv) == 1:
-        print('usage:', argv[0], 'action ...', file=stderr)
-        sys_exit(1)
-    actions = argv[1:]
+    args = Commander('Gojira CI/CD Automation Tool', [Argument('action', choices=ACTIONS)]).parse_args()
+    actions = [args.action]
 
     env_vars = {}
     for (var, default) in ENV_VARS.items():
@@ -38,7 +35,7 @@ def main() -> None:
     for (var, value) in env_vars.items():
         putenv(var, value.format(**env_vars))
 
-    if getenv('_CICD_ENV', '') == 'dev-user':
+    if getenv('GOJIRA_ENV', '') == 'local':
         if not getenv('VIRTUAL_ENV', ''):
             print('This must be run from a virtual environment.', file=stderr)
             sys_exit(1)
@@ -49,14 +46,9 @@ def main() -> None:
                 print(line)
         print(f'Python version: {python_version}')
 
-    unknown_actions = set(actions) - set(ACTIONS)
-    if unknown_actions:
-        print('Unknown actions requested:', ','.join(unknown_actions))
-        sys_exit(1)
-
     _initialize()
     for action in actions:
-        action_module = import_module(f'.{action}')
+        action_module = import_module(f'gojira.{action}')
         action_module.__dict__[action]()
 
 
@@ -76,4 +68,4 @@ def _initialize() -> None:
 if __name__ == '__main__':
     main()
 
-# cSpell:ignore putenv gojira
+# cSpell:ignore batcave putenv gojira

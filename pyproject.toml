@@ -38,6 +38,9 @@ test = [
 ]
 # doc = []
 
+[project.scripts]
+gojira = "gojira.gojira:main"
+
 [project.urls]
 homepage = "https://github.com/tardis4500/gojira/"
 documentation = "https://gojira.readthedocs.io"
