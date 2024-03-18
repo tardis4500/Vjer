@@ -1,3 +1,0 @@
-remove_artifact_target: false
-backup_artifact_target: false
-backup_artifact_suffix: _Backup

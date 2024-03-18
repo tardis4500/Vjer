@@ -240,3 +240,4 @@ $RECYCLE.BIN/
 
 .p4cfg
 .git/
+unit_test_results/

@@ -1,0 +1,74 @@
+# TODO:
+# - Determine how to get bumpver to work with branch restrictions.
+
+name: Gojira Publish
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: The run to publish
+        required: true
+        type: number
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  ARTIFACTS_DIR: dist
+  GIT_AUTHOR_NAME: "${{ github.triggering_actor }}"
+  GIT_AUTHOR_EMAIL: "${{ github.triggering_actor }}@users.noreply.github.com"
+  PYTHON_BUILD_VER: "3.11"
+  VIRTUAL_ENV: venv
+
+jobs:
+  publish-test:
+    runs-on: ubuntu-latest
+    environment: Staging
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_BUILD_VER }}
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.VIRTUAL_ENV }}
+          key: pip-${{ runner.os }}-${{ matrix.python-version }}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.inputs.run_id }}
+          github-token: ${{ secrets.ARTIFACT_TOKEN_NEW }}
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      - run: cicd-support/cicd.sh "${{ github.job }}"
+
+  publish:
+    needs: publish-test
+    runs-on: ubuntu-latest
+    environment: Production
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_BUILD_VER }}
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.VIRTUAL_ENV }}
+          key: pip-${{ runner.os }}-${{ matrix.python-version }}
+      - run: cicd-support/cicd.sh "${{ github.job }}"
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACTS_DIR }}
+          path: ${{ env.ARTIFACTS_DIR }}
+
+# cSpell:ignore bumpver gojira noreply venv pypa pypi

@@ -2,6 +2,23 @@
 # pylint: disable-all
 # cSpell:ignore unindented todos numericals docstrings
 
+# Step1: Add module level docstrings, including attributes.
+# Step2: Add module level function docstrings.
+# Step3: Add class docstrings.
+# Step4: Add Error docstrings.
+# Step5: Add class __init__ docstrings. Arguments, Attributes, Raises.
+# Step6: Add class property docstrings.
+# Step7: Add class method docstrings.
+# Step8: Add class private method docstrings.
+# Step9: Reorder Classes: private, protected, properties, methods.
+# Step10: Fix enums.
+# Step11: Add PEP484 type hints.
+# Step12: Add PEP526 variable type annotations
+# Step13: Add linting and type checking to build pipeline.
+# Step14: Change pylint numericals
+# Step15: Walrus operator (:=)
+# Step16: Positional arguments (/, *)
+
 # -*- coding: utf-8 -*-
 """Example Google style docstrings.
 

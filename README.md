@@ -1,40 +1,58 @@
-# Build and Release Toolkit Images
+# Gojira Python Module
 
-This repository provides support images for build and deploy activities.
+A module for automating CI/CD tasks.
+
+## Developing
+
+Development is best accomplished using virtualenv or virtualenv-wrapper where a virtual environment can be generated:
+
+    mkvirtualenv gojira
+    python -m pip install --upgrade pip
+    pip install --upgrade --upgrade-strategy eager setuptools wheel
+    pip install --upgrade --upgrade-strategy eager flit
+    Windows: flit install --deps all
+    Linux: flit install -s --deps all
+
+To update the current development environment
+
+    python -m pip install --upgrade pip
+    pip install --upgrade --upgrade-strategy eager setuptools wheel
+    Windows: pip freeze | %{$_.split('==')[0]} | %{pip install --upgrade $_}
+    Linux: pip freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install --upgrade
 
 ## Testing
 
-The following should be tested before a new BaRT release.
+### Static Analysis
 
-- All changes
-  - [SRECleaner](https://gitlab.buildone.co/cc/sre/srecleaner)
-  - [SRECleanerDeployer](https://gitlab.buildone.co/deployers/srecleanerdeployer)
-- Linux changes
-  - [ExportAgent](https://gitlab.buildone.co/product-development/cc-platform/export)
-  - [PPR UI](https://gitlab.buildone.co/product-development/cc-platform/ppr)
-  - [AdminPortal BE](https://gitlab.buildone.co/product-development/cc-platform/admin-portal/ccs.adminportal)
-  - [AdminPortal UI](https://gitlab.buildone.co/product-development/cc-platform/admin-portal/adminportal-frontend)
-  - [UI Component Library](https://gitlab.buildone.co/product-development/cc-platform/ui-component-library)
-  - [Entitlements](https://gitlab.buildone.co/product-development/cc-platform/CCS.Entitlements)
-- Windows changes
-  - [PPR BE](https://gitlab.buildone.co/product-development/cc-platform/project-plan-room)
+The static analysis test can be run with
 
-The test procedure is performed from the util directory
+    pylint gojira
+    flake8 gojira
+    mypy gojira
 
-1. Test the SRECleaner build and deploy:
-    - python test_images.py {BaRT-Template-Branch} SRECleaner
-    - run the deploy-development job
-    - run the pre-release job
-    - remove the test branch
-1. Test the SRECleanerDeployer deployments:
-    - python test_images.py {BaRT-Template-Branch} SRECleanerDeployer {SRECleaner-Pre-Release-Version}
-    - create a new pipeline for the SRECleanerDeployer on the release/bart-testing branch
-    - run the deploy-staging job
-    - remove the test branch
-1. For each of the remaining projects
-    - python test_images.py {BaRT-Template-Branch} {Project}
-    - run any manual scans
-    - remove the test branch
-    - remove the test pipeline
+### Unit Tests
 
-<!-- cSpell:ignore cicd -->
+The unit tests can be run with
+
+    python -m unittest -v [tests.test_suite[.test_class[.test_case]]]
+
+## Building
+
+The build can be run with
+
+    flit build
+
+## Publishing a Release
+
+This is the procedure for releasing Gojira
+
+1. Validate all issues are "Ready for Release"
+1. Update CHANGELOG.md
+1. Run the publish workflow against the Production environment
+1. Validate GitHub release
+1. Validate PyPi
+1. Move issues to "Closed"
+1. Close Milestone
+1. Update source in Perforce
+
+<!--- cSpell:ignore virtualenv mkvirtualenv gojira stest mypy xmlrunner utest -->

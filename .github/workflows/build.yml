@@ -1,0 +1,76 @@
+name: Gojira Build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  ARTIFACTS_DIR: dist
+  PYTHON_BUILD_VER: "3.11"
+  UNIT_TEST_DIR: unit_test_results
+  VIRTUAL_ENV: venv
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.11"
+          - "3.12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.VIRTUAL_ENV }}
+          key: pip-${{ runner.os }}-${{ matrix.python-version }}
+      - run: cicd-support/cicd.sh "${{ github.job }}"
+
+  build:
+    needs:
+      - static-analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_BUILD_VER }}
+          cache: "pip"
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.VIRTUAL_ENV }}
+          key: pip-${{ runner.os }}-${{ env.PYTHON_BUILD_VER }}
+      - run: cicd-support/cicd.sh "${{ github.job }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACTS_DIR }}
+          path: ${{ env.ARTIFACTS_DIR }}
+
+  install-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_BUILD_VER }}
+      - uses: actions/download-artifact@v4
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.VIRTUAL_ENV }}
+          key: pip-${{ runner.os }}-${{ env.PYTHON_BUILD_VER }}
+      - run: cicd-support/cicd.sh "${{ github.job }}"
+
+  show-run-id:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{ github.run_id }}
+
+# cSpell:ignore gojira venv

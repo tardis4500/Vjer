@@ -1,59 +1,48 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
 [project]
-name = "cicd-support"
-authors = [{name = "Jeffery G. Smith", email = "Jeff.Smith@constructconnect.com"}]
-readme = "README.md"
-license = {file = "LICENSE"}
+name = "gojira"
+authors = [{ name = "Jeffery G. Smith", email = "web@pobox.com" }]
+readme = "DOCUMENTATION.md"
+license = { file = "LICENSE" }
 dynamic = ["version", "description"]
 
-requires-python = "~=3.10"
-keywords = ["GitLab", "pipeline", "utilities"]
+requires-python = "~=3.11"
+keywords = ["python", "programming", "utilities"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "License :: Proprietary",
+    "License :: OSI Approved :: MIT License",
 
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 
     "Intended Audience :: Developers",
     "Topic :: Software Development",
     "Natural Language :: English",
 ]
 
-dependencies = [
-    "ansible; sys_platform != 'win32'",
-    "BatCave",
-    "pyodbc; sys_platform == 'win32'",
-    "pyyaml",
-    "dicttoxml",
-    "dotmap",
-    "twine"
-]
+dependencies = ["BatCave~=43.0"]
 
 [project.optional-dependencies]
 dev = ["flit", "twine", "bumpver"]
 test = [
-    "ansible-lint; sys_platform != 'win32'",
-    "autopep8",
-    "doc8",
     "flake8",
     "flake8-annotations",
     "flake8-pyproject",
-    "junitparser",
     "mypy",
     "pylint",
-    "restview",
-    "rope",
     "types-PyYAML",
-    "types-requests",
-    "types-setuptools",
-    "types-xmltodict",
-    "unittest-xml-reporting"
+    "types-requests"
 ]
-deploy = ["pywinrm"]
+# doc = []
 
-[project_urls]
-repository = "https://gitlab.buildone.co/cc/sre/bart-images"
-changelog = "https://gitlab.buildone.co/cc/sre/bart-images/-/blob/main/CHANGELOG.md"
+[project.urls]
+homepage = "https://github.com/tardis4500/gojira/"
+documentation = "https://gojira.readthedocs.io"
+repository = "https://github.com/tardis4500/gojira/"
+changelog = "https://github.com/tardis4500/gojira/blob/main/CHANGELOG.md"
 
 [tool.flake8]
 max-line-length = 200
@@ -62,12 +51,12 @@ ignore = ["ANN002", "ANN003", "ANN101", "ANN204", "ANN401"]
 [tool.pylint.format]
 max-line-length = 200
 
-[tool.pylint.messages_control]
-disable = ["duplicate-code" , "fixme"]
+[tool.pylint.design]
+max-attributes = 10
+max-args = 10
 
-[[tool.mypy.overrides]]
-module = "dicttoxml.*"
-ignore_missing_imports = true
+[tool.pylint.messages_control]
+disable = ["duplicate-code", "fixme"]
 
 [[tool.mypy.overrides]]
 module = "docker.*"
@@ -78,19 +67,11 @@ module = "dotmap.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "junitparser.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
 module = "kubernetes.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "P4.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "pyodbc.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
@@ -105,6 +86,13 @@ ignore_missing_imports = true
 module = "wmi.*"
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-module = "xmlrunner.*"
-ignore_missing_imports = true
+[tool.bumpver]
+current_version = "v30.0.0rc0"
+version_pattern = "vMAJOR.MINOR.PATCH[PYTAGNUM]"
+commit_message = "bump version {old_version} -> {new_version} [skip-ci]"
+commit = true
+tag = false
+push = true
+
+[tool.bumpver.file_patterns]
+"gojira/__init__.py" = ["__version__ = '{pep440_version}'"]

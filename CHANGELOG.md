@@ -7,13 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [30.0.0] - Unreleased
+
+- Changed
+  - Converted to installable module.
+
+- Removed
+  - Removed support for all action types except Docker and Helm.
+
+## Release History
+
 ### [29.2.0] - 2023-09-08
 
 - Added
   - Added .NET 2.2 SDK to the Windows image. (SRE-11494)
   - Added Git to the Windows image.
-
-## Release History
 
 ### [29.1.0] - 2023-08-23
 
