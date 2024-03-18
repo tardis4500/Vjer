@@ -41,14 +41,14 @@ _CONFIG_SECTIONS = ('project', 'test', 'build', 'deploy', 'rollback', 'release')
 _VALID_SCHEMAS = [1]
 
 _DEFAULTS = DotMap(chart_repo=DotMap(type='oci',
-                                     url=getenv('_HELM_REPO')),
+                                     url=getenv('_GOJIRA_HELM_REPO')),
                    chart_root='helm-chart',
                    container_registry=DotMap(type='local',
-                                             name=getenv('_DOCKER_REPO')),
+                                             name=getenv('_GOJIRA_DOCKER_REPO')),
                    dockerfile='Dockerfile')
 
-PROJECT_CFG_VAR = 'PROJECT_CFG'
-PROJECT_CFG_FILE = getenv(PROJECT_CFG_VAR, 'project-cfg.yml')
+PROJECT_CFG_VAR = 'GOJIRA_CFG'
+PROJECT_CFG_FILE = getenv(PROJECT_CFG_VAR, 'gojira-cfg.yml')
 TOOL_REPORT = Path(__file__).parent.absolute() / 'tool_report.yml'
 
 HELM_CHART_FILE = 'Chart.yaml'
@@ -218,17 +218,16 @@ class ProjectConfig():
         project_root = Path.cwd()
         git_client = GitClient()
         self._sections = {'project': ConfigSection(project_root=project_root,
-                                                   artifacts_dir=project_root / git_client._BUILD_ARTIFACTS,
+                                                   artifacts_dir=project_root / git_client._GOJIRA_BUILD_ARTIFACTS,
                                                    build_num_var='BUILD_ID',
-                                                   p2_branch=git_client.branch if (git_client.branch in ('develop', 'rc')) else 'feature',
-                                                   test_results_dir=project_root / git_client._TEST_RESULTS),
+                                                   test_results_dir=project_root / git_client._GOJIRA_TEST_RESULTS),
                           'test': ConfigSection(),
                           'deploy': ConfigSection(clean=True),
                           'rollback': ConfigSection(clean=True),
                           'release': ConfigSection()}
         self._sections['build'] = ConfigSection(source_dir=self.project.project_root / 'src',
                                                 version_files=[],
-                                                artifacts_dir=self.project.project_root / git_client._BUILD_ARTIFACTS,
+                                                artifacts_dir=self.project.project_root / git_client._GOJIRA_BUILD_ARTIFACTS,
                                                 artifacts={},
                                                 build_date=str(datetime.now()),
                                                 platform=Platform().bart)

@@ -15,11 +15,11 @@ from batcave.commander import Argument, Commander
 from .utils import apt, apt_install, pip_install, pip_setup
 
 ACTIONS = ['test', 'build', 'deploy', 'rollback', 'pre_release', 'release', 'freeze']
-ENV_VARS = {'_BUILD_ARTIFACTS': 'artifacts',
-            '_TEST_RESULTS': 'test_results',
-            '_GCP_ARTIFACT_REGION': 'us',
-            '_DOCKER_REPO': '{_GCP_ARTIFACT_REGION}-docker.pkg.dev/{_GCP_ARTIFACT_REPO}/{_DOCKER_REPO_NAME}',
-            '_HELM_REPO': 'oci://{_GCP_ARTIFACT_REGION}-docker.pkg.dev/{_GCP_ARTIFACT_REPO}/{_HELM_REPO_NAME}'}
+ENV_VARS = {'_GOJIRA_BUILD_ARTIFACTS': 'artifacts',
+            '_GOJIRA_TEST_RESULTS': 'test_results',
+            '_GOJIRA_GCP_ARTIFACT_REGION': 'us',
+            '_GOJIRA_DOCKER_REPO': '{_GOJIRA_GCP_ARTIFACT_REGION}-docker.pkg.dev/{_GOJIRA_GCP_ARTIFACT_REPO}/{_GOJIRA_DOCKER_REPO_NAME}',
+            '_GOJIRA_HELM_REPO': 'oci://{_GOJIRA_GCP_ARTIFACT_REGION}-docker.pkg.dev/{_GOJIRA_GCP_ARTIFACT_REPO}/{_GOJIRA_HELM_REPO_NAME}'}
 
 
 def main() -> None:
