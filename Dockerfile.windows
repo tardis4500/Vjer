@@ -1,0 +1,58 @@
+FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-3.5 as base
+
+ARG PYTHON_RELEASE
+ENV CI=true
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHON_HOME="C:\Python$PYTHON_RELEASE"
+ENV PYTHON_SCRIPTS="$PYTHON_HOME\Scripts"
+ENV DOTNET="C:\Program Files\dotnet"
+
+SHELL ["powershell", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop';", "$ProgressPreference = 'SilentlyContinue';"]
+
+WORKDIR C:/
+COPY requirements-frozen-windows.txt requirements-frozen.txt
+COPY cicd-scripts/ cicd-scripts/
+
+RUN \
+    # Install Chocolatey support packages
+    Set-ExecutionPolicy Bypass -Scope Process -Force; \
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]'Tls,Tls11,Tls12'; \
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1')); \
+    choco install jfrog-cli-v2-jf 7zip nuget.commandline python$env:PYTHON_RELEASE sqlserver-odbcdriver git dotnetcore-2.2-sdk-2xx --yes --limitoutput --no-progress; \
+    # Update-SessionEnvironment; \
+    $env:PATH += ';' + $env:PYTHON_HOME + ';' + $env:PYTHON_SCRIPTS + ';' + $env:DOTNET; \
+    # Install Python support packages
+    python -m pip install --no-cache-dir --upgrade pip; \
+    pip install --no-cache-dir --upgrade setuptools wheel; \
+    pip install --no-cache-dir --upgrade --requirement requirements-frozen.txt; \
+    Remove-Item requirements-frozen.txt
+
+FROM base as test
+RUN \
+    # Lint Python scripts
+    flake8 --ignore=ANN001,ANN002,ANN003,ANN101,ANN102,ANN201,ANN202,ANN204,ANN206 --max-line-length=200 cicd-scripts; \
+    pylint --disable=fixme --max-args=10 --max-attributes=10 --max-line-length=200 cicd-scripts
+
+FROM base as final
+# hadolint ignore=SC1072
+RUN \
+    # Install legacy versions of NUnit
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]'Tls,Tls11,Tls12'; \
+    Invoke-WebRequest 'https://launchpad.net/nunitv2/trunk/2.6.3/+download/NUnit-2.6.3.zip' -OutFile $env:TEMP/NUnit1.zip; \
+    Expand-Archive -Path $env:TEMP/NUnit1.zip -DestinationPath 'C:/'; \
+    Remove-Item $env:TEMP/NUnit1.zip; \
+    Invoke-WebRequest 'https://github.com/nunit/nunitv2/releases/download/2.6.4/NUnit-2.6.4.zip' -OutFile $env:TEMP/NUnit2.zip; \
+    Expand-Archive -Path $env:TEMP/NUnit2.zip -DestinationPath 'C:/'; \
+    Remove-Item $env:TEMP/NUnit2.zip; \
+    # Install Visual Studio 2015 Build Tools
+    # Shout out to https://dingyuliang.me/net-framework-4-8-dockerfile-visual-studio-2019/
+    Invoke-WebRequest 'https://aka.ms/vs/15/release/vs_buildtools.exe' -OutFile $env:TEMP/vs_buildtools.exe; \
+    Start-Process \
+        -FilePath $env:TEMP/vs_buildtools.exe \
+        -Wait \
+        -PassThru \
+        -ArgumentList @('--installPath C:\BuildTools', '--norestart', '--wait', '--quiet', '--add Microsoft.VisualStudio.Web.BuildTools.ComponentGroup', '--add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools'); \
+    Remove-Item $env:TEMP/vs_buildtools.exe; \
+    python cicd-scripts/tool_report.py -o cicd-scripts/tool_report.yml; \
+    Get-Content cicd-scripts/tool_report.yml

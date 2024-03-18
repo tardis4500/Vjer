@@ -1,0 +1,28 @@
+coco_environment: "{{ lookup('env', 'CI_ENVIRONMENT_NAME') }}"
+
+# Artifact storage variables
+artifact_store_url: "{{ lookup('env', 'ARTIFACTORY_URL') }}"
+artifact_store_user: "{{ lookup('env', 'JFROG_USER_LOGIN') }}"
+artifact_store_token: "{{ lookup('env', 'JFROG_USER_TOKEN') }}"
+
+# Docker variables
+docker_user: "{{ artifact_store_user }}"
+docker_token: "{{ artifact_store_token }}"
+docker_registry: "{{ lookup('env', 'CC_DOCKER_REGISTRY') }}"
+
+# JAMS variables
+jams_user: "{{ lookup('env', 'JAMS_USER') }}"
+jams_password: "{{ lookup('env', 'JAMS_PASSWORD') }}"
+jams_hosts:
+  development: leb-dv-jams-01.dev.buildonetech.co
+  qa: leb-qa-jams-01.dev.buildonetech.co
+  staging: leb-st-jams-01.dev.buildonetech.co
+  production: leb-pr-jams-01.prod.buildonetech.co
+jams_host: "{{ jams_hosts[coco_environment] }}"
+
+# Load balancer variables
+load_balancer_host: 192.168.1.32
+load_balancer_user: "{{ lookup('env', 'F5_USER') }}"
+load_balancer_password: "{{ lookup('env', 'F5_PASSWORD') }}"
+
+# cSpell:ignore buildonetech

@@ -1,0 +1,9 @@
+- name: Deploy the artifacts
+  ansible.builtin.include_role:
+    name: jfrog
+    tasks_from: download_artifacts
+- name: Update the configuration files
+  ansible.windows.win_template:
+    src: "{{ item.name }}.j2"
+    dest: "{{ artifact_dest }}\\{{ item.dir }}\\{{ item.name }}"
+  loop: "{{ config_files }}"

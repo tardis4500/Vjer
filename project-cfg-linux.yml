@@ -1,0 +1,21 @@
+build:
+  steps:
+  - build_args:
+      CICD_IMAGE_REPO: '{var:CICD_IMAGE_REPO}'
+    dockerfile: Dockerfile.linux
+    image: bart-linux
+    name: Build Linux Docker image
+    type: docker
+project:
+  product: BaRT
+  version: 11.2.1
+release:
+  steps:
+  - image: bart-linux
+    name: Release Linux Docker Image
+    type: docker
+  - ignore: true
+    type: gitlab
+  - ignore: true
+    type: tag_source
+schema: 1

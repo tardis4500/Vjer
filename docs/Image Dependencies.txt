@@ -1,0 +1,6 @@
+These are the current images:
+    base: Python, cicd-scripts, apt installs
+    sencha: base, Java 8, Sencha
+    scan: base, Java 11, JFrog CLI
+    linux: base, GCP SDK, kubectl, Docker CLI, Helm
+    dotnet: scan, dotnet SDK

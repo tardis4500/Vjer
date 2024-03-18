@@ -1,0 +1,12 @@
+- name: Manage the load balancer nodes
+  bigip_node:
+    name: "{{ item }}"
+    provider:
+      server: "{{ load_balancer_host }}"
+      user: "{{ load_balancer_user }}"
+      password: "{{ load_balancer_password }}"
+      server_port: 443
+      validate_certs: false
+      no_f5_teem: false
+    state: "{{ load_balancer_node_state }}"
+  loop: "{{ load_balancer_nodes }}"

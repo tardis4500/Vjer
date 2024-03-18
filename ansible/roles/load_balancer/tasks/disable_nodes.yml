@@ -1,0 +1,4 @@
+- name: Disable the load balancer nodes
+  vars:
+    load_balancer_node_state: offline
+  ansible.builtin.include_tasks: manage_nodes.yml

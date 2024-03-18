@@ -1,0 +1,50 @@
+coco_environment: "{{ lookup('env', 'CI_ENVIRONMENT_NAME') }}"
+
+# Google cloud parameters
+gcp_service_account_key: "{{ lookup('env', 'ANSIBLE_GCP_KEY') }}"
+gcp_region: us-east1
+gcp_zone_letter: b
+gcp_zone: "{{ gcp_region }}-{{ gcp_zone_letter }}"
+gcp_network_project: tools-270718
+gcp_dns_managed_zones:
+  internal:
+    name: buildone
+    dns_name: buildone.co.
+  external:
+    name: buildone
+    dns_name: buildone.co.
+
+gcp_environments:
+  devuser:
+    project_name: kube-validation-252619
+    ssa_cluster: val-cluster
+    subnet: validation-east
+    dns_suffix: -devuser
+  development:
+    project_name: adminstration-193912
+    ssa_cluster: ssa-dev-cluster
+    subnet: dev-qa-east1
+    dns_suffix: -dev
+  qa:
+    project_name: adminstration-193912
+    ssa_cluster: ssa-qa-cluster
+    subnet: dev-qa-east1
+    dns_suffix: -qa
+  staging:
+    project_name: ccstaging-200213
+    ssa_cluster: ssa-stage-cluster
+    subnet: staging-east1
+    dns_suffix: -stage
+  production:
+    project_name: ccprod-200213
+    ssa_cluster: ssa-cluster
+    subnet: prod-east1
+    dns_suffix:
+
+gcp_environment: "{{ gcp_environments[coco_environment] | default(gcp_environments['devuser']) }}"
+gcp_project_name: "{{ gcp_environment['project_name'] }}"
+gcp_subnet: "{{ gcp_environment['subnet'] }}"
+gcp_dns_suffix: "{{ gcp_environment['dns_suffix'] }}"
+gke_ssa_cluster_name: "{{ gcp_environment['ssa_cluster'] }}"
+
+# cSpell:ignore adminstration devuser buildone ccstaging ccprod

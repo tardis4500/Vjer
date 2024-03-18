@@ -1,0 +1,20 @@
+ARG CICD_IMAGE_REPO
+ARG BUILD_VERSION
+FROM ${CICD_IMAGE_REPO}bart-base:${BUILD_VERSION}
+
+WORKDIR /work
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# hadolint ignore=DL3008
+RUN RED='\033[0;31m' && \
+    NC='\033[0m' && \
+    echo -e "${RED} Install Java runtime ${NC}" && \
+    apt-get -y update && \
+    apt-get -y --no-install-recommends install openjdk-11-jre && \
+    echo -e "${RED} Install JFrog Client ${NC}" && \
+    curl -fL https://install-cli.jfrog.io | sh && \
+    echo -e "${RED} Run tool report ${NC}" && \
+    python /cicd-scripts/tool_report.py -o /cicd-scripts/tool_report.yml && \
+    cat /cicd-scripts/tool_report.yml && \
+    echo -e "${RED} Cleanup ${NC}" && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

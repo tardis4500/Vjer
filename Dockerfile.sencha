@@ -1,0 +1,23 @@
+ARG CICD_IMAGE_REPO
+ARG BUILD_VERSION
+FROM ${CICD_IMAGE_REPO}bart-base:${BUILD_VERSION}
+
+ENV JAVA_HOME=/usr/local/jdk8u362-b09-jre
+ENV SENCHA_VERSION=5.0.3.324
+ENV PATH="${PATH}:/usr/local/Sencha/Cmd/${SENCHA_VERSION}"
+
+WORKDIR /work
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN RED='\033[0;31m' && \
+    NC='\033[0m' && \
+    echo -e "${RED} Install Java ${NC}" && \
+    curl -fsSL "${ARTIFACTORY_URL}/bart-published-files/OpenJDK8U-jre_x64_linux_hotspot_8u362b09.tar.gz" -H "Authorization: Bearer ${JFROG_USER_TOKEN}" | tar xzf - -C /usr/local && \
+    ln -s /usr/local/jdk8u362-b09-jre/bin/java /usr/local/bin/java && \
+    echo -e "${RED} Install Sencha ${NC}" && \
+    curl -fsSL "${ARTIFACTORY_URL}/bart-published-files/sencha-${SENCHA_VERSION}.7z" -o "/tmp/sencha-${SENCHA_VERSION}.7z" -H "Authorization: Bearer ${JFROG_USER_TOKEN}" && \
+    7z x -o/usr/local "/tmp/sencha-${SENCHA_VERSION}.7z" && \
+    rm "/tmp/sencha-${SENCHA_VERSION}.7z" && \
+    chmod +x "/usr/local/Sencha/Cmd/${SENCHA_VERSION}/sencha" && \
+    echo -e "${RED} Run tool report ${NC}" && \
+    python /cicd-scripts/tool_report.py -o /cicd-scripts/tool_report.yml && \
+    cat /cicd-scripts/tool_report.yml
