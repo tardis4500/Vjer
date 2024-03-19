@@ -37,7 +37,7 @@ class ReleaseStep(GojiraStep):
 
     def release_helm(self) -> None:
         """Perform a release of a Helm chart."""
-        helm('push', self.helm_package, self.helm_repo.url if (self.helm_repo.type == 'oci') else self.helm_repo.name, **self.helm_repo.push_args)
+        helm('push', self.helm_package, self.helm_repo.name, **self.helm_repo.push_args)
 
     def release_increment_release(self) -> None:
         """Increment the project release version."""

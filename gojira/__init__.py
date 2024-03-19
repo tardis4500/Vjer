@@ -9,11 +9,11 @@ __all__ = ('__title__', '__summary__', '__uri__',
            '__author__', '__email__',
            '__license__', '__copyright__')
 
-__title__ = 'BatCave'
-__summary__ = 'Python Programming Toolkit'
+__title__ = 'Gojira'
+__summary__ = 'CI/CD Toolkit'
 __uri__ = 'https://github.com/tardis4500/gojira/'
 
-__version__ = '30.0.0rc2'
+__version__ = '30.0.0rc35'
 __build_name__ = '{var:build_name}'
 __build_date__ = '{var:build_date}'
 

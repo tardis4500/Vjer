@@ -1,7 +1,6 @@
 """Module to hold common values and utility functions for CI/CD support scripts.
 
 Attributes:
-    PROJECT_CFG_VAR (str): The environment variable used to specify a non-default project config file.
     PROJECT_CFG_FILE (str): The name of the project config file.
     TOOL_REPORT (Path): The path of the tool report.
 
@@ -40,15 +39,7 @@ from .tool_reporter import tool_reporter
 _CONFIG_SECTIONS = ('project', 'test', 'build', 'deploy', 'rollback', 'release')
 _VALID_SCHEMAS = [1]
 
-_DEFAULTS = DotMap(chart_repo=DotMap(type='oci',
-                                     url=getenv('_GOJIRA_HELM_REPO')),
-                   chart_root='helm-chart',
-                   container_registry=DotMap(type='local',
-                                             name=getenv('_GOJIRA_DOCKER_REPO')),
-                   dockerfile='Dockerfile')
-
-PROJECT_CFG_VAR = 'GOJIRA_CFG'
-PROJECT_CFG_FILE = getenv(PROJECT_CFG_VAR, 'gojira-cfg.yml')
+PROJECT_CFG_FILE = getenv('GOJIRA_CFG', 'gojira.yml')
 TOOL_REPORT = Path(__file__).parent.absolute() / 'tool_report.yml'
 
 HELM_CHART_FILE = 'Chart.yaml'
@@ -57,6 +48,7 @@ DEFAULT_VERSION_FILES = {'helm': [HELM_CHART_FILE, 'values.yaml']}
 RELEASE_PRE_STEPS = ['tag_source']
 RELEASE_POST_STEPS = ['increment_release']
 
+GOJIRA_ENV = getenv('GOJIRA_ENV', 'local')
 REMOTE_REF = 'gojira_origin'
 
 apt = SysCmdRunner('apt-get', '-y').run
@@ -98,7 +90,7 @@ class Environment:  # pylint: disable=too-few-public-methods
         return value
 
 
-class GitClient(Environment):  # pylint: disable=too-many-instance-attributes
+class GitClient(Environment):
     """Provides an interface to the Git server environment and API."""
 
     def __init__(self, project_id: Optional[str] = None, client_root: Optional[PathName] = None, branch: Optional[str] = None):
@@ -152,7 +144,7 @@ class ConfigSection():
                 if isinstance(value, list):
                     return [self._expander.expand(v) for v in value]
                 if isinstance(value, dict):
-                    return {k: self._expander.expand(v) for (k, v) in value.items()}
+                    return DotMap({k: self._expander.expand(v) for (k, v) in value.items()})
                 if isinstance(value, str):
                     return self._expander.expand(value)
                 return value
@@ -181,7 +173,7 @@ class ConfigSection():
         if property_dict:
             self._expander.var_dict |= property_dict
 
-    def update(self, values: dict, /) -> None:
+    def update(self, values: dict | DotMap, /) -> None:
         """Update the configuration section values.
 
         Args:
@@ -192,7 +184,7 @@ class ConfigSection():
         """
         self._values |= values
 
-    def update_defaults(self, values: dict, /) -> None:
+    def update_defaults(self, values: dict | DotMap, /) -> None:
         """Updates the configuration section default values.
 
         Args:
@@ -207,7 +199,7 @@ class ConfigSection():
 class ProjectConfig():
     """Stores project related configuration items."""
 
-    def __init__(self):  # pylint: disable=too-many-branches,too-many-locals
+    def __init__(self):
         """
         Attributes:
             _config_file: The config file for the project configuration.
@@ -216,48 +208,27 @@ class ProjectConfig():
             use_steps: A dictionary of steps by section.
         """
         project_root = Path.cwd()
-        git_client = GitClient()
         self._sections = {'project': ConfigSection(project_root=project_root,
-                                                   artifacts_dir=project_root / git_client._GOJIRA_BUILD_ARTIFACTS,
+                                                   build_artifacts='artifacts',
                                                    build_num_var='BUILD_ID',
-                                                   test_results_dir=project_root / git_client._GOJIRA_TEST_RESULTS),
+                                                   chart_root='helm-chart',
+                                                   container_registry=DotMap(type='local', name=''),
+                                                   dockerfile='Dockerfile',
+                                                   gcp_artifact_region='us',
+                                                   test_results='test_results'),
                           'test': ConfigSection(),
                           'deploy': ConfigSection(clean=True),
                           'rollback': ConfigSection(clean=True),
                           'release': ConfigSection()}
         self._sections['build'] = ConfigSection(source_dir=self.project.project_root / 'src',
                                                 version_files=[],
-                                                artifacts_dir=self.project.project_root / git_client._GOJIRA_BUILD_ARTIFACTS,
                                                 artifacts={},
                                                 build_date=str(datetime.now()),
                                                 platform=Platform().bart)
         self._config_file = self.project.project_root / PROJECT_CFG_FILE
-        if not self._config_file.exists():
-            raise ConfigurationError(ConfigurationError.CONFIG_FILE_NOT_FOUND, file=self._config_file)
-        yaml_as_dict = DotMap(schema=0)
-        with open(self._config_file, encoding=DEFAULT_ENCODING) as config_file:
-            yaml_as_dict |= DotMap(yaml_load(config_file))
-        if not yaml_as_dict:
-            raise ConfigurationError(ConfigurationError.BAD_FORMAT, file=self._config_file)
-        if yaml_as_dict.schema not in _VALID_SCHEMAS:
-            raise ConfigurationError(ConfigurationError.INVALID_SCHEMA, found=yaml_as_dict.schema, expected=_VALID_SCHEMAS)
-        self.schema = yaml_as_dict.schema
-
-        for section in _CONFIG_SECTIONS:
-            if section in yaml_as_dict:
-                self._sections[section].update(yaml_as_dict[section])
-
-        if hasattr(self.project, 'version_service'):
-            self._set_version_from_service()
-        build_num = getenv(self.project.build_num_var, '0')
-        build_version = f'{self.project.version}-{build_num}'
-        self.build.update_defaults({'build_num': build_num,
-                                    'build_version': build_version,
-                                    'build_version_msbuild': f'{self.project.version}.{build_num}',
-                                    'build_name': f'{self.project.product}_{build_version}'})
-        self.release.update_defaults({'release_tag': f'v{self.project.version}'})
-        for (piece, index) in {'major': 0, 'minor': 1, 'patch': 2}.items():
-            self.project.update_defaults({f'{piece}': self.project.version.split('.', 2)[index]})
+        self._load_config()
+        self._set_defaults()
+        self._set_version()
 
         for section in _CONFIG_SECTIONS:
             self._sections[section].update_expander(property_holders=list(self._sections.values()))
@@ -289,12 +260,46 @@ class ProjectConfig():
                     return copy_object(step)
         return DotMap(type=step_type)
 
-    def _set_version_from_service(self) -> None:
-        """Set the project version from the service specified in the project config.
+    def _load_config(self) -> None:
+        if not self._config_file.exists():
+            raise ConfigurationError(ConfigurationError.CONFIG_FILE_NOT_FOUND, file=self._config_file)
+        yaml_as_dict = DotMap(schema=0)
+        with open(self._config_file, encoding=DEFAULT_ENCODING) as config_file:
+            yaml_as_dict |= DotMap(yaml_load(config_file))
+        if not yaml_as_dict:
+            raise ConfigurationError(ConfigurationError.BAD_FORMAT, file=self._config_file)
+        if yaml_as_dict.schema not in _VALID_SCHEMAS:
+            raise ConfigurationError(ConfigurationError.INVALID_SCHEMA, found=yaml_as_dict.schema, expected=_VALID_SCHEMAS)
+        self.schema = yaml_as_dict.schema
+        for section in _CONFIG_SECTIONS:
+            if section in yaml_as_dict:
+                self._sections[section].update(yaml_as_dict[section])
 
-        Returns:
-            Nothing.
-        """
+    def _set_defaults(self) -> None:
+        self.project.update_defaults(DotMap(artifacts_dir=self.project.project_root / self.project.build_artifacts,
+                                            test_results_dir=self.project.project_root / self.project.test_results))
+        if hasattr(self.project, 'artifact_repo'):
+            if hasattr(self.project, 'docker_repo'):
+                self.project.update_defaults(DotMap(container_registry=DotMap(type='local',
+                                                                              name=f'{self.project.gcp_artifact_region}-docker.pkg.dev/{self.project.artifact_repo}/{self.project.docker_repo}')))
+            if hasattr(self.project, 'helm_repo'):
+                self.project.update_defaults(DotMap(chart_repo=DotMap(type='oci',
+                                                                      name=f'oci://{self.project.gcp_artifact_region}-docker.pkg.dev/{self.project.artifact_repo}/{self.project.helm_repo}')))
+
+    def _set_version(self) -> None:
+        if hasattr(self.project, 'version_service'):
+            self._set_version_from_service()
+        build_num = getenv(self.project.build_num_var, '0')
+        build_version = f'{self.project.version}-{build_num}'
+        self.build.update_defaults(DotMap(build_num=build_num,
+                                          build_version=build_version,
+                                          build_version_msbuild=f'{self.project.version}.{build_num}',
+                                          build_name=f'{self.project.product}_{build_version}'))
+        self.release.update_defaults(DotMap(release_tag=f'v{self.project.version}'))
+        for (piece, index) in {'major': 0, 'minor': 1, 'patch': 2}.items():
+            self.project.update_defaults({f'{piece}': self.project.version.split('.', 2)[index]})
+
+    def _set_version_from_service(self) -> None:
         version_service = DotMap(self.project.version_service)
         match version_service.type:
             case 'environment':
@@ -353,9 +358,9 @@ class GojiraStep(Action):  # pylint: disable=too-many-instance-attributes
         self.image_tag = ''
 
     def __getattr__(self, attr: str):
-        if attr not in _DEFAULTS:
+        if not hasattr(self.project, attr):
             raise AttributeError(f'No such attribute: {attr}')
-        return getattr(self.step_info, attr) if getattr(self.step_info, attr) else _DEFAULTS[attr]
+        return getattr(self.step_info, attr) if getattr(self.step_info, attr) else getattr(self.project, attr)
 
     def _docker_init(self, login: bool = True) -> None:
         """Perform Docker initialization.
@@ -566,12 +571,5 @@ class GojiraAction:  # pylint: disable=too-few-public-methods
             (executor := cast(Callable, self.action_step_class)()).step_info = step
             executor.execute()
             is_first_step = False
-
-
-def pip_setup() -> None:
-    """Run pip initialization."""
-    pip_install('pip')
-    pip_install('setuptools', 'wheel')
-
 
 # cSpell:ignore batcave cloudmgr dotmap platarch syscmd gojira checkin

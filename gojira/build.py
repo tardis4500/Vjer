@@ -14,7 +14,7 @@ from batcave.sysutil import rmpath
 from docker.errors import BuildError as DockerBuildError
 
 # Import project modules
-from .utils import GojiraAction, GojiraStep, helm
+from .utils import GOJIRA_ENV, GojiraAction, GojiraStep, helm
 
 
 class BuildStep(GojiraStep):
@@ -78,7 +78,8 @@ class BuildStep(GojiraStep):
 
     def build_docker(self) -> None:
         """Run a Docker build."""
-        self._docker_init(push_image := not str_to_pythonval(getenv('NO_REMOTE_DOCKER_REGISTRY', '')))
+        push_image = str_to_pythonval(getenv('GOJIRA_DOCKER_PUSH', str(not GOJIRA_ENV == 'local')))
+        self._docker_init(push_image)
         self.log_message(f'Building docker image: {self.image_tag}', True)
         build_args = {'VERSION': self.project.version,
                       'BUILD_VERSION': self.build.build_version} | self.step_info.build_args

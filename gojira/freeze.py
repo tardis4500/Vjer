@@ -36,7 +36,7 @@ pip = SysCmdRunner('pip', show_cmd=False, show_stdout=False, syscmd_args={'ignor
 
 def freeze() -> None:
     """Create the requirement-freeze.txt file leaving out the development tools and adding platform specifiers."""
-    freeze_file = (PROJECT_ROOT / (FREEZE_FILE_BASE + (f'-{argv[1]}' if (len(argv) > 1) else ''))).with_suffix(FREEZE_FILE_EXT)
+    freeze_file = (PROJECT_ROOT / (FREEZE_FILE_BASE + (f'-{argv[2]}' if (len(argv) > 2) else ''))).with_suffix(FREEZE_FILE_EXT)
     print('Creating virtual environment in:', venv_dir := Path(mkdtemp()))
     EnvBuilder(with_pip=True).create(venv_dir)
     python = ((venv_bin := venv_dir / ('Scripts' if WIN32 else 'bin')) / 'python').with_suffix('.exe' if WIN32 else '')
