@@ -4,10 +4,10 @@
 from typing import cast
 
 # Import project modules
-from .utils import GojiraAction, GojiraStep, helm
+from .utils import VjerAction, VjerStep, helm
 
 
-class RollbackStep(GojiraStep):
+class RollbackStep(VjerStep):
     """This class provides rollback support."""
 
     def rollback_helm(self) -> None:
@@ -20,6 +20,6 @@ class RollbackStep(GojiraStep):
 
 def rollback() -> None:
     """This is the main entry point."""
-    GojiraAction('rollback', cast(GojiraStep, RollbackStep)).execute()
+    VjerAction('rollback', cast(VjerStep, RollbackStep)).execute()
 
-# cSpell:ignore gojira
+# cSpell:ignore vjer

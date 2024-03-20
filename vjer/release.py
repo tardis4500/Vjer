@@ -7,10 +7,10 @@ from typing import cast
 from batcave.cloudmgr import gcloud
 
 # Import project modules
-from .utils import helm, GojiraAction, GojiraStep
+from .utils import helm, VjerAction, VjerStep
 
 
-class ReleaseStep(GojiraStep):
+class ReleaseStep(VjerStep):
     """Provide release support.
 
     Attributes:
@@ -65,6 +65,6 @@ class ReleaseStep(GojiraStep):
 
 def release() -> None:
     """This is the main entry point."""
-    GojiraAction('release', cast(GojiraStep, ReleaseStep)).execute()
+    VjerAction('release', cast(VjerStep, ReleaseStep)).execute()
 
-# cSpell:ignore syscmd batcave cloudmgr gojira
+# cSpell:ignore syscmd batcave cloudmgr vjer

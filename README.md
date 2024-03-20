@@ -1,4 +1,4 @@
-# Gojira Python Module
+# Vjer Python Module
 
 A module for automating CI/CD tasks.
 
@@ -6,7 +6,7 @@ A module for automating CI/CD tasks.
 
 Development is best accomplished using virtualenv or virtualenv-wrapper where a virtual environment can be generated:
 
-    mkvirtualenv gojira
+    mkvirtualenv vjer
     python -m pip install --upgrade pip
     pip install --upgrade --upgrade-strategy eager setuptools wheel
     pip install --upgrade --upgrade-strategy eager flit
@@ -26,9 +26,9 @@ To update the current development environment
 
 The static analysis test can be run with
 
-    pylint gojira
-    flake8 gojira
-    mypy gojira
+    pylint vjer
+    flake8 vjer
+    mypy vjer
 
 ### Unit Tests
 
@@ -44,7 +44,7 @@ The build can be run with
 
 ## Publishing a Release
 
-This is the procedure for releasing Gojira
+This is the procedure for releasing Vjer
 
 1. Validate all issues are "Ready for Release"
 1. Update CHANGELOG.md
@@ -55,4 +55,4 @@ This is the procedure for releasing Gojira
 1. Close Milestone
 1. Update source in Perforce
 
-<!--- cSpell:ignore virtualenv mkvirtualenv gojira stest mypy xmlrunner utest -->
+<!--- cSpell:ignore virtualenv mkvirtualenv vjer stest mypy xmlrunner utest -->

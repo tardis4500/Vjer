@@ -10,10 +10,10 @@ from batcave.sysutil import rmpath, syscmd
 from yaml import full_load as yaml_load
 
 # Import project modules
-from .utils import DEFAULT_ENCODING, GojiraAction, GojiraStep, helm
+from .utils import DEFAULT_ENCODING, VjerAction, VjerStep, helm
 
 
-class TestStep(GojiraStep):
+class TestStep(VjerStep):
     """This class provides test support."""
 
     def pre(self) -> None:
@@ -47,6 +47,6 @@ class TestStep(GojiraStep):
 
 def test() -> None:
     """This is the main entry point."""
-    GojiraAction('test', cast(GojiraStep, TestStep)).execute()
+    VjerAction('test', cast(VjerStep, TestStep)).execute()
 
-# cSpell:ignore batcave fileutil syscmd hadolint dockerfiles gojira
+# cSpell:ignore batcave fileutil syscmd hadolint dockerfiles vjer

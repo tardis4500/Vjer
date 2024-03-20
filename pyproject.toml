@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "gojira"
+name = "vjer"
 authors = [{ name = "Jeffery G. Smith", email = "web@pobox.com" }]
 readme = "DOCUMENTATION.md"
 license = { file = "LICENSE" }
@@ -39,13 +39,13 @@ test = [
 # doc = []
 
 [project.scripts]
-gojira = "gojira.gojira:main"
+vjer = "vjer.vjer:main"
 
 [project.urls]
-homepage = "https://github.com/tardis4500/gojira/"
-documentation = "https://gojira.readthedocs.io"
-repository = "https://github.com/tardis4500/gojira/"
-changelog = "https://github.com/tardis4500/gojira/blob/main/CHANGELOG.md"
+homepage = "https://github.com/tardis4500/vjer/"
+documentation = "https://vjer.readthedocs.io"
+repository = "https://github.com/tardis4500/vjer/"
+changelog = "https://github.com/tardis4500/vjer/blob/main/CHANGELOG.md"
 
 [tool.flake8]
 max-line-length = 200
@@ -90,7 +90,7 @@ module = "wmi.*"
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "v30.0.0rc35"
+current_version = "v30.0.0rc38"
 version_pattern = "vMAJOR.MINOR.PATCH[PYTAGNUM]"
 commit_message = "bump version {old_version} -> {new_version} [skip-ci]"
 commit = true
@@ -98,4 +98,4 @@ tag = false
 push = true
 
 [tool.bumpver.file_patterns]
-"gojira/__init__.py" = ["__version__ = '{pep440_version}'"]
+"vjer/__init__.py" = ["__version__ = '{pep440_version}'"]

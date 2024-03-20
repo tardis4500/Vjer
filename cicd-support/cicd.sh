@@ -6,7 +6,7 @@ if [[ -z ${1:-''} ]]; then
     exit 1
 fi
 
-PRODUCT=gojira
+PRODUCT=vjer
 export FLIT_ROOT_INSTALL=1
 
 unix_os=$(uname)
@@ -84,4 +84,4 @@ publish)
     ;;
 esac
 
-# cSpell:ignore gojira bumpver virtualenv
+# cSpell:ignore vjer bumpver virtualenv

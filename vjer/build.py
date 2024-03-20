@@ -14,10 +14,10 @@ from batcave.sysutil import rmpath
 from docker.errors import BuildError as DockerBuildError
 
 # Import project modules
-from .utils import GOJIRA_ENV, GojiraAction, GojiraStep, helm
+from .utils import VJER_ENV, VjerAction, VjerStep, helm
 
 
-class BuildStep(GojiraStep):
+class BuildStep(VjerStep):
     """This class provides build support.
 
         Build processing flow:
@@ -78,7 +78,7 @@ class BuildStep(GojiraStep):
 
     def build_docker(self) -> None:
         """Run a Docker build."""
-        push_image = str_to_pythonval(getenv('GOJIRA_DOCKER_PUSH', str(not GOJIRA_ENV == 'local')))
+        push_image = str_to_pythonval(getenv('VJER_DOCKER_PUSH', str(not VJER_ENV == 'local')))
         self._docker_init(push_image)
         self.log_message(f'Building docker image: {self.image_tag}', True)
         build_args = {'VERSION': self.project.version,
@@ -112,6 +112,6 @@ class BuildStep(GojiraStep):
 
 def build() -> None:
     """This is the main entry point."""
-    GojiraAction('build', cast(GojiraStep, BuildStep)).execute()
+    VjerAction('build', cast(VjerStep, BuildStep)).execute()
 
-# cSpell:ignore batcave fileutil pythonval buildargs gojira
+# cSpell:ignore batcave fileutil pythonval buildargs vjer

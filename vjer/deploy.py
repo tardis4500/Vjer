@@ -4,10 +4,10 @@
 from typing import cast
 
 # Import project modules
-from .utils import helm, GojiraAction, GojiraStep
+from .utils import helm, VjerAction, VjerStep
 
 
-class DeployStep(GojiraStep):
+class DeployStep(VjerStep):
     """This class provides deployment support."""
 
     def deploy_helm(self) -> None:
@@ -29,6 +29,6 @@ class DeployStep(GojiraStep):
 
 def deploy() -> None:
     """This is the main entry point."""
-    GojiraAction('deploy', cast(GojiraStep, DeployStep)).execute()
+    VjerAction('deploy', cast(VjerStep, DeployStep)).execute()
 
-# cSpell:ignore gojira
+# cSpell:ignore vjer

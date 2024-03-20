@@ -1,7 +1,7 @@
 # TODO:
 # - Determine how to get bumpver to work with branch restrictions.
 
-name: Gojira Publish
+name: Vjer Publish
 on:
   workflow_dispatch:
     inputs:
@@ -71,4 +71,4 @@ jobs:
           name: ${{ env.ARTIFACTS_DIR }}
           path: ${{ env.ARTIFACTS_DIR }}
 
-# cSpell:ignore bumpver gojira noreply venv pypa pypi
+# cSpell:ignore bumpver vjer noreply venv pypa pypi

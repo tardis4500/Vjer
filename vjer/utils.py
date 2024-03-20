@@ -39,7 +39,7 @@ from .tool_reporter import tool_reporter
 _CONFIG_SECTIONS = ('project', 'test', 'build', 'deploy', 'rollback', 'release')
 _VALID_SCHEMAS = [1]
 
-PROJECT_CFG_FILE = getenv('GOJIRA_CFG', 'gojira.yml')
+PROJECT_CFG_FILE = getenv('VJER_CFG', 'vjer.yml')
 TOOL_REPORT = Path(__file__).parent.absolute() / 'tool_report.yml'
 
 HELM_CHART_FILE = 'Chart.yaml'
@@ -48,8 +48,8 @@ DEFAULT_VERSION_FILES = {'helm': [HELM_CHART_FILE, 'values.yaml']}
 RELEASE_PRE_STEPS = ['tag_source']
 RELEASE_POST_STEPS = ['increment_release']
 
-GOJIRA_ENV = getenv('GOJIRA_ENV', 'local')
-REMOTE_REF = 'gojira_origin'
+VJER_ENV = getenv('VJER_ENV', 'local')
+REMOTE_REF = 'vjer_origin'
 
 apt = SysCmdRunner('apt-get', '-y').run
 apt_install = SysCmdRunner('apt-get', '-y', 'install', no_install_recommends=True).run
@@ -107,7 +107,7 @@ class GitClient(Environment):
             project_id: The value of the project_id argument.
         """
         self.project_id = project_id
-        self.client = Client(ClientType.git, 'gojira', connect_info=str(client_root), create=False) if (client_root and (Path(client_root) / '.git').exists()) else None
+        self.client = Client(ClientType.git, 'vjer', connect_info=str(client_root), create=False) if (client_root and (Path(client_root) / '.git').exists()) else None
         self.branch = branch if branch else getattr(self, 'CI_COMMIT_BRANCH', '')
 
     def __enter__(self):
@@ -323,7 +323,7 @@ class ProjectConfig():
                       config_file, indent=2)
 
 
-class GojiraStep(Action):  # pylint: disable=too-many-instance-attributes
+class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
     """ Class to represent a single Action step."""
 
     def __init__(self):
@@ -407,7 +407,7 @@ class GojiraStep(Action):  # pylint: disable=too-many-instance-attributes
     def helm_repo(self) -> DotMap:
         """A read-only property which returns the Helm repo name with a randomized suffix."""
         if (self.chart_repo.type != 'oci') and self.chart_repo.url and not self.chart_repo.name:
-            repo_name = f'gojira-{randint(0, 100)}'
+            repo_name = f'vjer-{randint(0, 100)}'
             helm('repo', 'add', repo_name, self.chart_repo.url)
             helm('repo', 'update')
             self.chart_repo.name = repo_name
@@ -529,9 +529,9 @@ class GojiraStep(Action):  # pylint: disable=too-many-instance-attributes
                         yaml_dump(helm_info, yaml_stream)
 
 
-class GojiraAction:  # pylint: disable=too-few-public-methods
+class VjerAction:  # pylint: disable=too-few-public-methods
     """This is a base class to build CI/CD support scripts using the BatCave automation module Action class."""
-    def __init__(self, action_type: str, action_step_class: GojiraStep):
+    def __init__(self, action_type: str, action_step_class: VjerStep):
         """
         Args:
             action_type: The action type.
@@ -548,11 +548,11 @@ class GojiraAction:  # pylint: disable=too-few-public-methods
 
     def execute(self) -> None:
         """Run the action."""
-        GojiraStep().log_message(f'Starting {__title__} version {__version__} ({__build_name__}) [{__build_date__}]', True)
+        VjerStep().log_message(f'Starting {__title__} version {__version__} ({__build_name__}) [{__build_date__}]', True)
         for (category, info) in (yaml_to_dotmap(TOOL_REPORT) if TOOL_REPORT.exists() else tool_reporter()).items():
-            GojiraStep().log_message(category.replace('_', ' ').title(), True)
+            VjerStep().log_message(category.replace('_', ' ').title(), True)
             for (name, data) in info.items():
-                GojiraStep().log_message(f'  {name}: {data}')
+                VjerStep().log_message(f'  {name}: {data}')
         steps = []
         if self.action_type in self.config.use_steps:
             steps = self.config.use_steps[self.action_type]
@@ -565,11 +565,11 @@ class GojiraAction:  # pylint: disable=too-few-public-methods
         for step in [DotMap(s) for s in steps]:
             step.is_first_step = is_first_step
             verb = 'Skipping' if step.ignore else 'Executing'
-            GojiraStep().log_message(f'{verb} {self.action_type} step: {step.type if (not step.name) else step.name}', True)
+            VjerStep().log_message(f'{verb} {self.action_type} step: {step.type if (not step.name) else step.name}', True)
             if step.ignore:
                 continue
             (executor := cast(Callable, self.action_step_class)()).step_info = step
             executor.execute()
             is_first_step = False
 
-# cSpell:ignore batcave cloudmgr dotmap platarch syscmd gojira checkin
+# cSpell:ignore batcave cloudmgr dotmap platarch syscmd vjer checkin

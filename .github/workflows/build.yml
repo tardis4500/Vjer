@@ -1,4 +1,4 @@
-name: Gojira Build
+name: Vjer Build
 on:
   push:
   pull_request:
@@ -73,4 +73,4 @@ jobs:
     steps:
       - run: echo ${{ github.run_id }}
 
-# cSpell:ignore gojira venv
+# cSpell:ignore vjer venv

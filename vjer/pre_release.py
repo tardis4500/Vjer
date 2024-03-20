@@ -5,7 +5,7 @@ from typing import cast
 
 # Import project modules
 from .release import ReleaseStep
-from .utils import GojiraAction, GojiraStep, helm
+from .utils import VjerAction, VjerStep, helm
 
 
 class PreReleaseStep(ReleaseStep):
@@ -37,6 +37,6 @@ class PreReleaseStep(ReleaseStep):
 
 def pre_release() -> None:
     """This is the main entry point."""
-    GojiraAction('release', cast(GojiraStep, PreReleaseStep)).execute()
+    VjerAction('release', cast(VjerStep, PreReleaseStep)).execute()
 
-# cSpell:ignore batcave gojira
+# cSpell:ignore batcave vjer

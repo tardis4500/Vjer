@@ -1,7 +1,7 @@
-gojira
+vjer
 =======
 
 .. toctree::
    :maxdepth: 4
 
-   gojira
+   vjer

@@ -13,12 +13,12 @@
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path.cwd().parent))
-from gojira import __author__, __copyright__  # noqa: E402
+from vjer import __author__, __copyright__  # noqa: E402
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Gojira'
+project = 'Vjer'
 copyright = __copyright__
 author = __author__
 
