@@ -1,6 +1,3 @@
-# TODO:
-# - Determine how to get bumpver to work with branch restrictions.
-
 name: Vjer Publish
 on:
   workflow_dispatch:
@@ -26,6 +23,7 @@ jobs:
     environment: Staging
     permissions:
       contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -42,7 +40,6 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
       - run: cicd-support/cicd.sh "${{ github.job }}"
 
   publish:
