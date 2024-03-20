@@ -37,6 +37,13 @@ from . import __title__, __version__, __build_name__, __build_date__
 from .tool_reporter import tool_reporter
 
 _CONFIG_SECTIONS = ('project', 'test', 'build', 'deploy', 'rollback', 'release')
+_PROJECT_DEFAULTS = DotMap(build_artifacts='artifacts',
+                           build_num_var='VJER_BUILD_NUM',
+                           chart_root='helm-chart',
+                           container_registry=DotMap(type='local', name=''),
+                           dockerfile='Dockerfile',
+                           gcp_artifact_region='us',
+                           test_results='test_results')
 _VALID_SCHEMAS = [1]
 
 PROJECT_CFG_FILE = getenv('VJER_CFG', 'vjer.yml')
@@ -208,14 +215,7 @@ class ProjectConfig():
             use_steps: A dictionary of steps by section.
         """
         project_root = Path.cwd()
-        self._sections = {'project': ConfigSection(project_root=project_root,
-                                                   build_artifacts='artifacts',
-                                                   build_num_var='BUILD_ID',
-                                                   chart_root='helm-chart',
-                                                   container_registry=DotMap(type='local', name=''),
-                                                   dockerfile='Dockerfile',
-                                                   gcp_artifact_region='us',
-                                                   test_results='test_results'),
+        self._sections = {'project': ConfigSection(**(DotMap(project_root=project_root) | _PROJECT_DEFAULTS)),
                           'test': ConfigSection(),
                           'deploy': ConfigSection(clean=True),
                           'rollback': ConfigSection(clean=True),
