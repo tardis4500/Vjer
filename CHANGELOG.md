@@ -9,8 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### [31.0.0] - Unreleased
 
+- Added
+  - Added bumpver version service. (GitHub #2)
+  - Added python test types: flake8, pylint, and mypy. (GitHub #2)
+  - Added __main__.py to enable module execution.
+
 - Changed
   - Improved version code.
+  - Report any OS.
+  - Changed project.product to project.name.
 
 - Removed
   - Removed semver version service.
@@ -1719,4 +1726,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Initial release
 
 <!-- cSpell:ignore filecopy pywinrm pyparsing removeprefix removesuffix pylance sqldb ssdt servermgr versionlock syscmd sqlodbc sqlcmd installargs -->
-<!-- cSpell:ignore sshpass sencha -->
+<!-- cSpell:ignore sshpass sencha bumpver -->

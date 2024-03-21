@@ -7,13 +7,11 @@ Since this program can be called before the requirements are install, it can onl
 from importlib import import_module
 import os
 from os import getenv
-from platform import uname
+from platform import platform
 from sys import exit as sys_exit, stderr, version as python_version
 
 # Import third-party modules
 from batcave.commander import Argument, Commander
-from batcave.fileutil import slurp
-from batcave.sysutil import syscmd
 
 # Import local modules
 from .utils import apt, apt_install, VJER_ENV, pip_install, ProjectConfig, ConfigurationError, PROJECT_CFG_FILE
@@ -25,16 +23,7 @@ def main() -> None:
     """The main entrypoint."""
     args = Commander('Vjer CI/CD Automation Tool', [Argument('actions', choices=ACTIONS, nargs='+')]).parse_args()
     _setup_environment()
-
-    match uname().system:
-        case 'Darwin':
-            syscmd('sw_vers', show_stdout=True)
-        case 'Linux':
-            print(slurp('/etc/os-release'))
-        case _:
-            print('Unknown OS:', uname().system, file=stderr)
-            sys_exit(1)
-    print(f'Python version: {python_version}')
+    print(f'OS: {platform()}\nPython version: {python_version}')
 
     _sys_initialize()
     for action in args.actions:

@@ -12,7 +12,7 @@ class DeployStep(VjerStep):
 
     def deploy_helm(self) -> None:
         """Deploy method for Helm charts."""
-        chart_name = self.step_info.chart_name if self.step_info.chart_name else self.project.product.lower()
+        chart_name = self.step_info.chart_name if self.step_info.chart_name else self.project.name.lower()
         release_name = self.step_info.release_name.lower() if self.step_info.release_name else chart_name
         helm_args = self.helm_args
         is_remote = self.step_info.remote is not False

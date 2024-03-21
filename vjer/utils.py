@@ -29,6 +29,7 @@ from batcave.expander import Expander, file_expander
 from batcave.lang import BatCaveError, BatCaveException, PathName, DEFAULT_ENCODING, WIN32, yaml_to_dotmap
 from batcave.platarch import Platform
 from batcave.sysutil import CMDError, SysCmdRunner, syscmd
+from bumpver.config import init as bumpver_config
 from dotmap import DotMap
 from yaml import safe_dump as yaml_dump, safe_load as yaml_load
 
@@ -45,7 +46,7 @@ _PROJECT_DEFAULTS = DotMap(build_artifacts='artifacts',
                            gcp_artifact_region='us',
                            test_results='test_results',
                            version_service=DotMap(type='vjer'))
-_VALID_SCHEMAS = [1]
+_VALID_SCHEMAS = [2]
 
 PROJECT_CFG_FILE = getenv('VJER_CFG', 'vjer.yml')
 TOOL_REPORT = Path(__file__).parent.absolute() / 'tool_report.yml'
@@ -289,6 +290,8 @@ class ProjectConfig():
 
     def _set_version(self) -> None:
         match self.project.version_service.type:
+            case 'bumpver':
+                self.project.version = bumpver_config()[1].pep440_version
             case 'environment':
                 self.project.version = getenv(self.project.version_service.variable, '').rstrip('.')
             case 'vjer':
@@ -301,7 +304,7 @@ class ProjectConfig():
         self.build.update_defaults(DotMap(build_num=build_num,
                                           build_version=build_version,
                                           build_version_msbuild=f'{self.project.version}.{build_num}',
-                                          build_name=f'{self.project.product}_{build_version}'))
+                                          build_name=f'{self.project.name}_{build_version}'))
         self.release.update_defaults(DotMap(release_tag=f'v{self.project.version}'))
         for (piece, index) in {'major': 0, 'minor': 1, 'patch': 2}.items():
             self.project.update_defaults({f'{piece}': self.project.version.split('.', 2)[index]})
@@ -371,7 +374,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         self.registry_client = Cloud(CloudType[self.container_registry.type], login=login)
         self.docker_client = Cloud(CloudType.local)
         registry_name_path = f'{self.container_registry.name}/' if login else ''
-        self.image_name = f'{registry_name_path}{self.step_info.image if self.step_info.image else self.project.product}'
+        self.image_name = f'{registry_name_path}{self.step_info.image if self.step_info.image else self.project.name}'
         self.version_tag = f'{self.image_name}:{self.project.version}'
         self.image_tag = f'{self.version_tag}-{self.build.build_num}'.lower()
 
@@ -386,7 +389,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
 
     helm_chart_root = property(lambda s: Path(s.chart_root), doc='A read-only property which returns the helm chart root.')
     helm_package = property(lambda s: s.project.artifacts_dir / (s.pkg_name.lower() + '.tgz'), doc='A read-only property which returns the helm chart package name.')
-    pkg_name = property(lambda s: f'{s.step_info.pkg_name if s.step_info.pkg_name else s.project.product}-{s.project.version}',
+    pkg_name = property(lambda s: f'{s.step_info.pkg_name if s.step_info.pkg_name else s.project.name}-{s.project.version}',
                         doc='A read-only property which returns the release package name.')
 
     @property
@@ -568,4 +571,4 @@ class VjerAction:  # pylint: disable=too-few-public-methods
             executor.execute()
             is_first_step = False
 
-# cSpell:ignore batcave cloudmgr dotmap platarch syscmd vjer checkin
+# cSpell:ignore batcave bumpver cloudmgr dotmap platarch syscmd vjer checkin

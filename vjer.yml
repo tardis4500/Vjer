@@ -1,0 +1,13 @@
+schema: 2
+project:
+  name: vjer
+  version_service:
+    type: bumpver
+test:
+  steps:
+    - type: flake8
+    - type: pylint
+    - type: mypy
+    - type: python_unittest
+
+# cSpell: ignore bumpver vjer

@@ -2,11 +2,15 @@
 
 # Import standard modules
 from pathlib import Path
+from sys import exit as sys_exit, stderr
 from typing import cast
+from unittest import defaultTestLoader
 
 # Import third-party-modules
 from batcave.fileutil import slurp
-from batcave.sysutil import rmpath, syscmd
+from batcave.sysutil import rmpath, syscmd, SysCmdRunner
+from junitparser import JUnitXml
+from xmlrunner import XMLTestRunner
 from yaml import full_load as yaml_load
 
 # Import project modules
@@ -15,6 +19,10 @@ from .utils import DEFAULT_ENCODING, VjerAction, VjerStep, helm
 
 class TestStep(VjerStep):
     """This class provides test support."""
+
+    def _test_runner(self, test_name: str) -> None:
+        """Run tester."""
+        SysCmdRunner(test_name, *(self.step_info.targets if self.step_info.targets else [self.project.name]), **self.step_info.options).run()
 
     def pre(self) -> None:
         """Prepare for testing on first run."""
@@ -35,6 +43,10 @@ class TestStep(VjerStep):
         if self.step_info.build_test_stage:
             self.docker_build(target=self.step_info.build_test_stage)
 
+    def test_flake8(self) -> None:
+        """Run python flake8 linter."""
+        self._test_runner('flake8')
+
     def test_helm(self) -> None:
         """Lint method for Helm charts."""
         helm('dependency', 'build', self.helm_chart_root)
@@ -44,9 +56,27 @@ class TestStep(VjerStep):
         if helm_info['type'] != 'library':
             helm('template', self.helm_chart_root, **self.helm_args)
 
+    def test_mypy(self) -> None:
+        """Run python mypy linter."""
+        self._test_runner('mypy')
+
+    def test_pylint(self) -> None:
+        """Run python pylint linter."""
+        self._test_runner('pylint')
+
+    def test_python_unittest(self) -> None:
+        """Runs the Python unittest module framework."""
+        XMLTestRunner(output=str(self.project.test_results_dir), failfast=True, verbosity=2).run(defaultTestLoader.discover(self.project.project_root))
+        for junit_results in self.project.test_results_dir.iterdir():
+            test_suite = JUnitXml.fromfile(str(junit_results))
+            if test_suite.errors or test_suite.failures:
+                print('Unit tests failed', file=stderr)
+                sys_exit(1)
+            junit_results.rename(junit_results.parent / f'junit-{junit_results.name}')
+
 
 def test() -> None:
     """This is the main entry point."""
     VjerAction('test', cast(VjerStep, TestStep)).execute()
 
-# cSpell:ignore batcave fileutil syscmd hadolint dockerfiles vjer
+# cSpell:ignore batcave fileutil syscmd hadolint dockerfiles vjer junitparser xmlrunner

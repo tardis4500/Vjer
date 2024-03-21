@@ -23,19 +23,21 @@ classifiers = [
     "Natural Language :: English",
 ]
 
-dependencies = ["BatCave~=43.0"]
-
-[project.optional-dependencies]
-dev = ["flit", "twine", "bumpver"]
-test = [
+dependencies = [
+    "BatCave~=43.0",
+    "bumpver",
+    "junitparser",
     "flake8",
     "flake8-annotations",
     "flake8-pyproject",
     "mypy",
     "pylint",
-    "types-PyYAML",
-    "types-requests"
+    "unittest-xml-reporting",
 ]
+
+[project.optional-dependencies]
+dev = ["flit", "twine"]
+test = ["types-PyYAML", "types-requests"]
 # doc = []
 
 [project.scripts]
@@ -62,6 +64,10 @@ max-args = 10
 disable = ["duplicate-code", "fixme"]
 
 [[tool.mypy.overrides]]
+module = "bumpver.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = "docker.*"
 ignore_missing_imports = true
 
@@ -70,23 +76,7 @@ module = "dotmap.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = "kubernetes.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "P4.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "pywintypes.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "win32typing.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "wmi.*"
+module = "xmlrunner.*"
 ignore_missing_imports = true
 
 [tool.bumpver]
