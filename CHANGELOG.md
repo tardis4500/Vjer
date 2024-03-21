@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [30.0.0] - Unreleased
+### [30.0.0] - 2024-03-20
 
 - Changed
   - Converted to installable module.
