@@ -43,7 +43,8 @@ _PROJECT_DEFAULTS = DotMap(build_artifacts='artifacts',
                            container_registry=DotMap(type='local', name=''),
                            dockerfile='Dockerfile',
                            gcp_artifact_region='us',
-                           test_results='test_results')
+                           test_results='test_results',
+                           version_service=DotMap(type='vjer'))
 _VALID_SCHEMAS = [1]
 
 PROJECT_CFG_FILE = getenv('VJER_CFG', 'vjer.yml')
@@ -287,8 +288,14 @@ class ProjectConfig():
                                                                       name=f'oci://{self.project.gcp_artifact_region}-docker.pkg.dev/{self.project.artifact_repo}/{self.project.helm_repo}')))
 
     def _set_version(self) -> None:
-        if hasattr(self.project, 'version_service'):
-            self._set_version_from_service()
+        match self.project.version_service.type:
+            case 'environment':
+                self.project.version = getenv(self.project.version_service.variable, '').rstrip('.')
+            case 'vjer':
+                pass
+            case _:
+                print('Unknown version service:', self.project.version_service.type, file=stderr)
+                sys_exit(1)
         build_num = getenv(self.project.build_num_var, '0')
         build_version = f'{self.project.version}-{build_num}'
         self.build.update_defaults(DotMap(build_num=build_num,
@@ -298,17 +305,6 @@ class ProjectConfig():
         self.release.update_defaults(DotMap(release_tag=f'v{self.project.version}'))
         for (piece, index) in {'major': 0, 'minor': 1, 'patch': 2}.items():
             self.project.update_defaults({f'{piece}': self.project.version.split('.', 2)[index]})
-
-    def _set_version_from_service(self) -> None:
-        version_service = DotMap(self.project.version_service)
-        match version_service.type:
-            case 'environment':
-                self.project.version = getenv(version_service.variable, '').rstrip('.')
-            case 'semver':
-                self.project.version = version_service.value
-            case _:
-                print('Unknown version service:', version_service.type, file=stderr)
-                sys_exit(1)
 
     filename = property(lambda s: s._config_file, doc='A read-only property which returns the configuration file name.')
 

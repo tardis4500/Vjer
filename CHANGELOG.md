@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [31.0.0] - Unreleased
+
+- Changed
+  - Improved version code.
+
+- Removed
+  - Removed semver version service.
+
+## Release History
+
 ### [30.0.0] - 2024-03-20
 
 - Changed
@@ -14,8 +24,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Removed
   - Removed support for all action types except Docker and Helm.
-
-## Release History
 
 ### [29.2.0] - 2023-09-08
 
