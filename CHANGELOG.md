@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### [30.0.0] - 2024-03-20
 
 - Changed
-  - Converted to installable module.
+  - Converted to installable module. (GitHub #1)
 
 - Removed
   - Removed support for all action types except Docker and Helm.
