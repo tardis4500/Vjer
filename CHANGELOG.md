@@ -10,17 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### [31.0.0] - Unreleased
 
 - Added
-  - Added bumpver version service. (GitHub #2)
-  - Added python test types: flake8, pylint, and mypy. (GitHub #2)
-  - Added __main__.py to enable module execution.
+  - Added bumpver version service. (GitHub #3)
+  - Added python test types: flake8, pylint, and mypy. (GitHub #3)
+  - Added __main__.py to enable module execution. (GitHub #4)
 
 - Changed
-  - Improved version code.
-  - Report any OS.
-  - Changed project.product to project.name.
+  - Improved version code. (GitHub #4)
+  - Report any OS. (GitHub #4)
+  - Changed project.product to project.name. (GitHub #4)
 
 - Removed
-  - Removed semver version service.
+  - Removed semver version service. (GitHub #4)
 
 ## Release History
 
