@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [31.0.0] - Unreleased
+### [31.0.0] - 2024-03-21
 
 - Added
   - Added bumpver version service. (GitHub #3)
