@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "BatCave~=43.0",
+    "BatCave",
     "bumpver",
     "junitparser",
     "flake8",
