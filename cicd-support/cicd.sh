@@ -29,12 +29,6 @@ function install-pip-tools {
     pip install --upgrade --upgrade-strategy eager setuptools wheel
 }
 
-function static-analysis {
-    pylint $PRODUCT
-    flake8 $PRODUCT
-    mypy $PRODUCT
-}
-
 function run-bumpver {
     git config user.name "$GIT_AUTHOR_NAME"
     git config user.email "$GIT_AUTHOR_EMAIL"
@@ -64,7 +58,7 @@ local-build)
     flit build
     ;;
 static-analysis)
-    static-analysis
+    vjer test
     ;;
 build)
     flit build
