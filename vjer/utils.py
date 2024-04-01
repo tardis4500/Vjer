@@ -4,9 +4,6 @@ Attributes:
     PROJECT_CFG_FILE (str): The name of the project config file.
     TOOL_REPORT (Path): The path of the tool report.
 
-    RELEASE_PRE_STEPS (list): The list of release steps to perform before the ones specified for the project.
-    RELEASE_POST_STEPS (list): The list of release steps to perform before the ones specified for the project.
-
     There are several tool runners defined for simplified usage: git, helm.
 """
 # Import standard modules
@@ -53,9 +50,6 @@ TOOL_REPORT = Path(__file__).parent.absolute() / 'tool_report.yml'
 
 HELM_CHART_FILE = 'Chart.yaml'
 DEFAULT_VERSION_FILES = {'helm': [HELM_CHART_FILE, 'values.yaml']}
-
-RELEASE_PRE_STEPS = ['tag_source']
-RELEASE_POST_STEPS = ['increment_release']
 
 VJER_ENV = getenv('VJER_ENV', 'local')
 REMOTE_REF = 'vjer_origin'
@@ -214,7 +208,6 @@ class ProjectConfig():
             _config_file: The config file for the project configuration.
             _sections: A list of the sections in the project configuration.
             schema: The schema version of the project configuration.
-            use_steps: A dictionary of steps by section.
         """
         project_root = Path.cwd()
         self._sections = {'project': ConfigSection(**(DotMap(project_root=project_root) | _PROJECT_DEFAULTS)),
@@ -234,12 +227,6 @@ class ProjectConfig():
 
         for section in _CONFIG_SECTIONS:
             self._sections[section].update_expander(property_holders=list(self._sections.values()))
-
-        release_steps = [self._get_phase_step('release', s) for s in RELEASE_PRE_STEPS]
-        if hasattr(self.release, 'steps'):
-            release_steps += [copy_object(s) for s in self.release.steps if s.get('type') not in RELEASE_PRE_STEPS + RELEASE_POST_STEPS]
-        release_steps += [self._get_phase_step('release', s) for s in RELEASE_POST_STEPS]
-        self.use_steps = {'release': release_steps}
 
     def __getattr__(self, attr: str):
         if attr not in self._sections:
@@ -552,16 +539,11 @@ class VjerAction:  # pylint: disable=too-few-public-methods
             VjerStep().log_message(category.replace('_', ' ').title(), True)
             for (name, data) in info.items():
                 VjerStep().log_message(f'  {name}: {data}')
-        steps = []
-        if self.action_type in self.config.use_steps:
-            steps = self.config.use_steps[self.action_type]
-        elif hasattr(action_def := getattr(self.config, self.action_type), 'steps'):
-            steps = action_def.steps
-        if not steps:
+        if not hasattr(action_def := getattr(self.config, self.action_type), 'steps'):
             return
 
         is_first_step = True
-        for step in [DotMap(s) for s in steps]:
+        for step in [DotMap(s) for s in action_def.steps]:
             step.is_first_step = is_first_step
             verb = 'Skipping' if step.ignore else 'Executing'
             VjerStep().log_message(f'{verb} {self.action_type} step: {step.type if (not step.name) else step.name}', True)
