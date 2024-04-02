@@ -8,5 +8,8 @@ test:
     - type: flake8
     - type: pylint
     - type: mypy
+build:
+  steps:
+    - type: flit
 
-# cSpell: ignore bumpver vjer
+    # cSpell: ignore bumpver vjer

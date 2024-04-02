@@ -12,6 +12,7 @@ from batcave.fileutil import pack
 from batcave.lang import str_to_pythonval
 from batcave.sysutil import rmpath
 from docker.errors import BuildError as DockerBuildError
+from flit.build import main as flit_build
 
 # Import project modules
 from .utils import VJER_ENV, VjerAction, VjerStep, helm
@@ -102,6 +103,10 @@ class BuildStep(VjerStep):
         if push_image:
             self.log_message('Pushing image to registry', True)
             self.registry_client.get_image(self.image_tag).push()
+
+    def build_flit(self) -> None:
+        """Run a Python flit build."""
+        flit_build(Path('pyproject.toml'))
 
     def build_helm(self) -> None:
         """Build method for Helm charts."""

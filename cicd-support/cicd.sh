@@ -61,7 +61,7 @@ static-analysis)
     vjer test
     ;;
 build)
-    flit build
+    vjer build
     ;;
 install-test)
     pip install $ARTIFACTS_DIR/*.tar.gz
