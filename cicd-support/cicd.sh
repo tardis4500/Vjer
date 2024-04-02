@@ -29,6 +29,12 @@ function install-pip-tools {
     pip install --upgrade --upgrade-strategy eager setuptools wheel
 }
 
+function prepare-git {
+    git config user.name "$GIT_AUTHOR_NAME"
+    git config user.email "$GIT_AUTHOR_EMAIL"
+    git pull
+}
+
 install-pip-tools
 pip install --upgrade --upgrade-strategy eager virtualenv
 if [[ ! -e $VIRTUAL_ENV ]]; then virtualenv $VIRTUAL_ENV; fi
@@ -39,10 +45,6 @@ if [[ $1 != install-test ]]; then
     pip install --upgrade --upgrade-strategy eager flit
     flit install -s --deps all
 fi
-
-git config user.name "$GIT_AUTHOR_NAME"
-git config user.email "$GIT_AUTHOR_EMAIL"
-git pull
 
 case $1 in
 static-analysis)
@@ -55,9 +57,11 @@ install-test)
     pip install $ARTIFACTS_DIR/*.tar.gz
     ;;
 pre_release)
+    prepare-git
     bumpver update --tag-num
     ;;
 release)
+    prepare-git
     bumpver update --tag final --tag-commit
     flit build
     eval $(bumpver show --env)
