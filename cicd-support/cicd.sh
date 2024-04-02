@@ -35,39 +35,28 @@ function prepare-git {
     git pull
 }
 
+if [[ $1 == install-test ]]; then
+    pip install $ARTIFACTS_DIR/*.tar.gz
+    exit
+fi
+
 install-pip-tools
 pip install --upgrade --upgrade-strategy eager virtualenv
 if [[ ! -e $VIRTUAL_ENV ]]; then virtualenv $VIRTUAL_ENV; fi
 source $VIRTUAL_ENV/bin/activate
 install-pip-tools
+pip install --upgrade --upgrade-strategy eager flit
+flit install -s --deps all
+vjer $1
 
-if [[ $1 != install-test ]]; then
-    pip install --upgrade --upgrade-strategy eager flit
-    flit install -s --deps all
-fi
-
-case $1 in
-static-analysis)
-    vjer test
-    ;;
-build)
-    vjer build
-    ;;
-install-test)
-    pip install $ARTIFACTS_DIR/*.tar.gz
-    ;;
-pre_release)
-    prepare-git
-    bumpver update --tag-num
-    ;;
-release)
-    prepare-git
-    bumpver update --tag final --tag-commit
-    flit build
-    eval $(bumpver show --env)
-    gh release create $CURRENT_VERSION --title="Release $CURRENT_VERSION" --latest --generate-notes
-    bumpver update --patch --tag rc --tag-num
-    ;;
-esac
+# release)
+#     prepare-git
+#     bumpver update --tag final --tag-commit
+#     flit build
+#     eval $(bumpver show --env)
+#     gh release create $CURRENT_VERSION --title="Release $CURRENT_VERSION" --latest --generate-notes
+#     bumpver update --patch --tag rc --tag-num
+#     ;;
+# esac
 
 # cSpell:ignore vjer bumpver virtualenv

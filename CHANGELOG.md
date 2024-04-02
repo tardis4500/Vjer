@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### [32.0.0] - Unreleased
 
 - Added
-  - Added flit build support. (GitHub #2)
+  - Added flit and bumpver support. (GitHub #2)
 
 - Removed
   - Removed implicit release steps. (GitHub #6)

@@ -11,5 +11,8 @@ test:
 build:
   steps:
     - type: flit
+release:
+  steps:
+    - type: bumpver
 
 # cSpell: ignore bumpver vjer

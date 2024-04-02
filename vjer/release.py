@@ -5,6 +5,7 @@ from typing import cast
 
 # Import third-party modules
 from batcave.cloudmgr import gcloud
+from bumpver.cli import update as bumpver_update
 
 # Import project modules
 from .utils import helm, VjerAction, VjerStep
@@ -17,6 +18,10 @@ class ReleaseStep(VjerStep):
         is_pre_release: Specifies that this is not a pre-release action.
     """
     is_pre_release = False
+
+    def release_bumpver(self) -> None:
+        """Perform a bumpver on release."""
+        bumpver_update(['--tag-num'] if self.is_pre_release else [])
 
     def release_docker(self) -> None:
         """Perform a release of a Docker image by tagging."""
@@ -67,4 +72,4 @@ def release() -> None:
     """This is the main entry point."""
     VjerAction('release', cast(VjerStep, ReleaseStep)).execute()
 
-# cSpell:ignore syscmd batcave cloudmgr vjer
+# cSpell:ignore syscmd batcave cloudmgr vjer bumpver
