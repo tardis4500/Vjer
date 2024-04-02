@@ -24,9 +24,13 @@ Linux)
 esac
 python --version
 
+function pip-install {
+    pip install --upgrade --upgrade-strategy eager $*
+}
+
 function install-pip-tools {
-    pip install --upgrade --upgrade-strategy eager pip
-    pip install --upgrade --upgrade-strategy eager setuptools wheel
+    pip-install pip
+    pip-install setuptools wheel
 }
 
 function prepare-git {
@@ -36,11 +40,11 @@ function prepare-git {
 }
 
 install-pip-tools
-pip install --upgrade --upgrade-strategy eager virtualenv
+pip-install virtualenv
 if [[ ! -e $VIRTUAL_ENV ]]; then virtualenv $VIRTUAL_ENV; fi
 source $VIRTUAL_ENV/bin/activate
 install-pip-tools
-pip install --upgrade --upgrade-strategy eager flit
+pip-install flit
 flit install -s --deps all
 vjer $1
 
