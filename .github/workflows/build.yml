@@ -14,7 +14,7 @@ env:
   VIRTUAL_ENV: venv
 
 jobs:
-  static-analysis:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -35,7 +35,7 @@ jobs:
 
   build:
     needs:
-      - static-analysis
+      - test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
