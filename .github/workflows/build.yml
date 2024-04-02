@@ -62,11 +62,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_BUILD_VER }}
       - uses: actions/download-artifact@v4
-      - uses: actions/cache@v3
-        with:
-          path: ${{ env.VIRTUAL_ENV }}
-          key: pip-${{ runner.os }}-${{ env.PYTHON_BUILD_VER }}
-      - run: cicd-support/cicd.sh "${{ github.job }}"
+      - run: pip install ${{ env.ARTIFACTS_DIR }}/*.tar.gz
 
   show-run-id:
     runs-on: ubuntu-latest

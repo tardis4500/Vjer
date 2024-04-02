@@ -35,11 +35,6 @@ function prepare-git {
     git pull
 }
 
-if [[ $1 == install-test ]]; then
-    pip install $ARTIFACTS_DIR/*.tar.gz
-    exit
-fi
-
 install-pip-tools
 pip install --upgrade --upgrade-strategy eager virtualenv
 if [[ ! -e $VIRTUAL_ENV ]]; then virtualenv $VIRTUAL_ENV; fi
