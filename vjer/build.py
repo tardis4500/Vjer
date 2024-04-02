@@ -107,6 +107,7 @@ class BuildStep(VjerStep):
     def build_flit(self) -> None:
         """Run a Python flit build."""
         flit_build(Path('pyproject.toml'))
+        self.copy_artifact('dist')
 
     def build_helm(self) -> None:
         """Build method for Helm charts."""

@@ -1,9 +1,9 @@
-name: Vjer Publish
+name: Vjer Release
 on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: The run to publish
+        description: The run to release
         required: true
         type: number
 concurrency:
@@ -11,14 +11,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARTIFACTS_DIR: dist
+  ARTIFACTS_DIR: artifacts
   GIT_AUTHOR_NAME: "${{ github.triggering_actor }}"
   GIT_AUTHOR_EMAIL: "${{ github.triggering_actor }}@users.noreply.github.com"
   PYTHON_BUILD_VER: "3.11"
   VIRTUAL_ENV: venv
 
 jobs:
-  publish-test:
+  pre_release:
     runs-on: ubuntu-latest
     environment: Staging
     permissions:
@@ -42,8 +42,8 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
       - run: cicd-support/cicd.sh "${{ github.job }}"
 
-  publish:
-    needs: publish-test
+  release:
+    needs: pre_release
     runs-on: ubuntu-latest
     environment: Production
     permissions:

@@ -12,4 +12,4 @@ build:
   steps:
     - type: flit
 
-    # cSpell: ignore bumpver vjer
+# cSpell: ignore bumpver vjer

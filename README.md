@@ -48,7 +48,7 @@ This is the procedure for releasing Vjer
 
 1. Validate all issues are "Ready for Release"
 1. Update CHANGELOG.md
-1. Run the publish workflow against the Production environment
+1. Run the release workflow against the Production environment
 1. Validate GitHub release
 1. Validate PyPi
 1. Move issues to "Closed" and label res::complete
