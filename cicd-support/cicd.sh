@@ -33,12 +33,6 @@ function install-pip-tools {
     pip-install setuptools wheel
 }
 
-function prepare-git {
-    git config user.name "$GIT_AUTHOR_NAME"
-    git config user.email "$GIT_AUTHOR_EMAIL"
-    git pull
-}
-
 install-pip-tools
 pip-install virtualenv
 if [[ ! -e $VIRTUAL_ENV ]]; then virtualenv $VIRTUAL_ENV; fi
@@ -46,10 +40,14 @@ source $VIRTUAL_ENV/bin/activate
 install-pip-tools
 pip-install flit
 flit install -s --deps all
+if [[ $1 == 'pre_release' || $1 == 'release' ]]; then
+    git config user.name "$GIT_AUTHOR_NAME"
+    git config user.email "$GIT_AUTHOR_EMAIL"
+    git pull
+fi
 vjer $1
 
 # release)
-#     prepare-git
 #     bumpver update --tag final --tag-commit
 #     flit build
 #     eval $(bumpver show --env)
