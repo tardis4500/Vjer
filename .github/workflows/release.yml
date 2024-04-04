@@ -40,6 +40,7 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          packages-dir: ${{ env.ARTIFACTS_DIR }}
       - run: cicd-support/cicd.sh "${{ github.job }}"
 
   release:
@@ -62,6 +63,8 @@ jobs:
           key: pip-${{ runner.os }}-${{ matrix.python-version }}
       - run: cicd-support/cicd.sh "${{ github.job }}"
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ env.ARTIFACTS_DIR }}
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACTS_DIR }}
