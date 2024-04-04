@@ -1,4 +1,5 @@
-name: Vjer Release
+name: Vjer Publish
+
 on:
   workflow_dispatch:
     inputs:
