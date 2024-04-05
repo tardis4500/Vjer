@@ -13,7 +13,7 @@ __title__ = 'Vjer'
 __summary__ = 'CI/CD Toolkit'
 __uri__ = 'https://github.com/tardis4500/vjer/'
 
-__version__ = '32.0.0rc1'
+__version__ = '32.0.0rc2'
 __build_name__ = '{var:build_name}'
 __build_date__ = '{var:build_date}'
 
