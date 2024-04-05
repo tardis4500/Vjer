@@ -47,13 +47,4 @@ if [[ $1 == 'pre_release' || $1 == 'release' ]]; then
 fi
 vjer $1
 
-# release)
-#     bumpver update --tag final --tag-commit
-#     flit build
-#     eval $(bumpver show --env)
-#     gh release create $CURRENT_VERSION --title="Release $CURRENT_VERSION" --latest --generate-notes
-#     bumpver update --patch --tag rc --tag-num
-#     ;;
-# esac
-
 # cSpell:ignore vjer bumpver virtualenv

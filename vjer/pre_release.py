@@ -1,4 +1,4 @@
-"""This module provides pre-release actions."""
+"""This module provides pre_release actions."""
 
 # Import standard modules
 from typing import cast
@@ -12,17 +12,23 @@ class PreReleaseStep(ReleaseStep):
     """Provide pre_release support.
 
     Attributes:
-        is_pre_release: Specifies to the ReleaseStep parent class that this is a pre-release action.
+        is_pre_release: Specifies to the ReleaseStep parent class that this is a pre_release action.
     """
     is_pre_release = True
 
     def __init__(self):
-        """Sets the project version to a pre-release value."""
+        """Sets the project version to a pre_release value."""
         super().__init__()
         self.project.version = f'{self.project.version}-{self.pre_release_num}'
 
+    def release_bumpver(self) -> None:
+        """Perform a bumpver on release."""
+        if not self.step_info.args:
+            self.step_info.args = ['--tag-num']
+        super().release_bumpver()
+
     def release_helm(self) -> None:
-        """Pre-release a Helm chart."""
+        """Pre_release a Helm chart."""
         if self.helm_repo.type == 'oci':
             self.update_version_files()
             try:
@@ -39,4 +45,4 @@ def pre_release() -> None:
     """This is the main entry point."""
     VjerAction('release', cast(VjerStep, PreReleaseStep)).execute()
 
-# cSpell:ignore batcave vjer
+# cSpell:ignore batcave vjer bumpver

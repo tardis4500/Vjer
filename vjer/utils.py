@@ -321,7 +321,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
             git_client: The Git repository for the project.
             image_name: The Docker image name.
             image_tag: The Docker image tag.
-            pre_release_num: The pre-release suffix for the project.
+            pre_release_num: The pre_release suffix for the project.
             project: The project name.
             registry_client: The Docker image registry.
             release: The release configuration.

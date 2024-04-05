@@ -14,5 +14,16 @@ build:
 release:
   steps:
     - type: bumpver
+    - type: flit_build
+      release_only: true
+    - type: github
+      release_only: true
+    - type: bumpver
+      release_only: true
+      args:
+        - --patch
+        - --tag
+        - rc
+        - --tag-num
 
 # cSpell: ignore bumpver vjer

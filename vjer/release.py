@@ -15,13 +15,19 @@ class ReleaseStep(VjerStep):
     """Provide release support.
 
     Attributes:
-        is_pre_release: Specifies that this is not a pre-release action.
+        is_pre_release: Specifies that this is not a pre_release action.
     """
     is_pre_release = False
 
+    def _execute(self) -> None:
+        if self.is_pre_release and self.step_info.release_only:
+            self.log_message('Skipping on pre_release')
+            return
+        super()._execute()
+
     def release_bumpver(self) -> None:
         """Perform a bumpver on release."""
-        bumpver_update(['--tag-num'] if self.is_pre_release else [])
+        bumpver_update(self.step_info.args if self.step_info.args else ['--tag', 'final', '--tag-commit'])
 
     def release_docker(self) -> None:
         """Perform a release of a Docker image by tagging."""
@@ -40,15 +46,17 @@ class ReleaseStep(VjerStep):
                     image.tag(tag)
                     image.push()
 
+    #     flit build
+    #     eval $(bumpver show --env)
+    #     gh release create $CURRENT_VERSION --title="Release $CURRENT_VERSION" --latest --generate-notes
+    #     bumpver update --patch --tag rc --tag-num
+
     def release_helm(self) -> None:
         """Perform a release of a Helm chart."""
         helm('push', self.helm_package, self.helm_repo.name, **self.helm_repo.push_args)
 
     def release_increment_release(self) -> None:
         """Increment the project release version."""
-        if self.is_pre_release:
-            self.log_message('Skipping on pre-release')
-            return
         if hasattr(self.project, 'version_service'):
             self.log_message('Incrementing version service not supported...skipping')
             return
@@ -62,9 +70,6 @@ class ReleaseStep(VjerStep):
 
     def release_tag_source(self) -> None:
         """Tag the source in Git with a release tag."""
-        if self.is_pre_release:
-            self.log_message('Skipping on pre-release')
-            return
         self.tag_source(self.release.release_tag, f'Release {self.release.release_tag}')
 
 
