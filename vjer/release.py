@@ -5,6 +5,7 @@ from typing import cast
 
 # Import third-party modules
 from batcave.cloudmgr import gcloud
+from batcave.sysutil import SysCmdRunner
 from bumpver.cli import update as bumpver_update
 
 # Import project modules
@@ -46,10 +47,13 @@ class ReleaseStep(VjerStep):
                     image.tag(tag)
                     image.push()
 
-    #     flit build
-    #     eval $(bumpver show --env)
-    #     gh release create $CURRENT_VERSION --title="Release $CURRENT_VERSION" --latest --generate-notes
-    #     bumpver update --patch --tag rc --tag-num
+    def release_flit_build(self) -> None:
+        """Run a Python flit build."""
+        self.flit_build()
+
+    def release_github(self) -> None:
+        """Create a GitHub release."""
+        SysCmdRunner('gh', 'release', 'create', self.version, title=f'Release {self.version}', latest=True, generate_notes=True).run()
 
     def release_helm(self) -> None:
         """Perform a release of a Helm chart."""

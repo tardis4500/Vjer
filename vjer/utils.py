@@ -28,6 +28,7 @@ from batcave.platarch import Platform
 from batcave.sysutil import CMDError, SysCmdRunner, syscmd
 from bumpver.config import init as bumpver_config
 from dotmap import DotMap
+from flit.build import main as flit_builder
 from yaml import safe_dump as yaml_dump, safe_load as yaml_load
 
 # Import project modules
@@ -442,6 +443,11 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
             return
 
         copytree(str(src), str(use_dest), dirs_exist_ok=True)
+
+    def flit_build(self) -> None:
+        """Run a Python flit build."""
+        flit_builder(Path('pyproject.toml'))
+        self.copy_artifact('dist')
 
     def tag_source(self, tag: str, label: Optional[str] = None) -> None:
         """Tag the source in Git.
