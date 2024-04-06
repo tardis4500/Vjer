@@ -23,6 +23,7 @@ class PreReleaseStep(ReleaseStep):
 
     def release_bumpver(self) -> None:
         """Perform a bumpver on release."""
+        self.log_message('THIS IS HERE')
         if not self.step_info.args:
             self.step_info.args = ['--tag-num']
         super().release_bumpver()

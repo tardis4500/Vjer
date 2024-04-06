@@ -47,4 +47,4 @@ if [[ $1 == 'pre_release' || $1 == 'release' ]]; then
 fi
 vjer $1
 
-# cSpell:ignore vjer bumpver virtualenv
+# cSpell:ignore vjer virtualenv

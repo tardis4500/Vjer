@@ -21,6 +21,7 @@ class ReleaseStep(VjerStep):
     is_pre_release = False
 
     def _execute(self) -> None:
+        self.log_message('IN SPECIAL _execute')
         if self.is_pre_release and self.step_info.release_only:
             self.log_message('Skipping on pre_release')
             return
