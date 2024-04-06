@@ -21,9 +21,8 @@ release:
     - type: bumpver
       release_only: true
       args:
-        - --patch
-        - --tag
-        - rc
-        - --tag-num
+        patch: True
+        tag: rc
+        tag-num: True
 
 # cSpell: ignore bumpver vjer

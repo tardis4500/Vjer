@@ -6,10 +6,11 @@ from typing import cast
 # Import third-party modules
 from batcave.cloudmgr import gcloud
 from batcave.sysutil import SysCmdRunner
-from bumpver.cli import update as bumpver_update
 
 # Import project modules
 from .utils import helm, VjerAction, VjerStep
+
+bumpver_update = SysCmdRunner('bumpver', 'update', syscmd_args={'ignore_stderr': True}).run
 
 
 class ReleaseStep(VjerStep):
@@ -21,7 +22,6 @@ class ReleaseStep(VjerStep):
     is_pre_release = False
 
     def _execute(self) -> None:
-        self.log_message('IN SPECIAL _execute')
         if self.is_pre_release and self.step_info.release_only:
             self.log_message('Skipping on pre_release')
             return
@@ -29,7 +29,7 @@ class ReleaseStep(VjerStep):
 
     def release_bumpver(self) -> None:
         """Perform a bumpver on release."""
-        bumpver_update(self.step_info.args if self.step_info.args else ['--tag', 'final', '--tag-commit'])
+        bumpver_update(**(self.step_info.args if self.step_info.args else {'tag': 'final', 'tag-commit': True}))
 
     def release_docker(self) -> None:
         """Perform a release of a Docker image by tagging."""
