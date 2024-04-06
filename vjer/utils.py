@@ -551,10 +551,7 @@ class VjerAction:  # pylint: disable=too-few-public-methods
         is_first_step = True
         for step in [DotMap(s) for s in action_def.steps]:
             step.is_first_step = is_first_step
-            verb = 'Skipping' if step.ignore else 'Executing'
-            VjerStep().log_message(f'{verb} {self.action_type} step: {step.type if (not step.name) else step.name}', True)
-            if step.ignore:
-                continue
+            VjerStep().log_message(f'Executing {self.action_type} step: {step.type if (not step.name) else step.name}', True)
             (executor := cast(Callable, self.action_step_class)()).step_info = step
             executor.execute()
             is_first_step = False
