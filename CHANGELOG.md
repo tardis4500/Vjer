@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [32.0.0] - Unreleased
+### [32.0.0] - 2024-04-08
 
 - Added
   - Added flit and bumpver support. (GitHub #2)
