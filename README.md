@@ -6,41 +6,25 @@ A module for automating CI/CD tasks.
 
 Development is best accomplished using virtualenv or virtualenv-wrapper where a virtual environment can be generated:
 
-    mkvirtualenv vjer
-    python -m pip install --upgrade pip
-    pip install --upgrade --upgrade-strategy eager setuptools wheel
-    pip install --upgrade --upgrade-strategy eager flit
-    Windows: flit install --deps all
-    Linux: flit install -s --deps all
+    UNIX: util/new-env.sh
+    Windows: util\New-Env.ps1
 
 To update the current development environment
 
-    python -m pip install --upgrade pip
-    pip install --upgrade --upgrade-strategy eager setuptools wheel
-    Windows: pip freeze | %{$_.split('==')[0]} | %{pip install --upgrade $_}
-    Linux: pip freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install --upgrade
+    UNIX: util/update-env.sh
+    Windows: util\Update-Env.ps1
 
 ## Testing
 
-### Static Analysis
+The test suite can be run with
 
-The static analysis test can be run with
-
-    pylint vjer
-    flake8 vjer
-    mypy vjer
-
-### Unit Tests
-
-The unit tests can be run with
-
-    python -m unittest -v [tests.test_suite[.test_class[.test_case]]]
+    vjer test
 
 ## Building
 
 The build can be run with
 
-    flit build
+    vjer build
 
 ## Publishing a Release
 
@@ -56,4 +40,4 @@ This is the procedure for releasing Vjer
 1. Update the source in Perforce.
 1. If this was a release branch, merge to master.
 
-<!--- cSpell:ignore virtualenv mkvirtualenv vjer stest mypy xmlrunner utest -->
+<!--- cSpell:ignore vjer virtualenv -->
