@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [32.1.0] - Unreleased
+### [32.1.0] - 2024-04-11
 
 - Changed
   - Cleanup version output and add --version option. (GitHub #8)
