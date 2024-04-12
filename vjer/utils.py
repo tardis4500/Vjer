@@ -32,7 +32,6 @@ from flit.build import main as flit_builder
 from yaml import safe_dump as yaml_dump, safe_load as yaml_load
 
 # Import project modules
-from . import __title__, __version__, __build_name__, __build_date__
 from .tool_reporter import tool_reporter
 
 _CONFIG_SECTIONS = ('project', 'test', 'build', 'deploy', 'rollback', 'release')
@@ -540,7 +539,6 @@ class VjerAction:  # pylint: disable=too-few-public-methods
 
     def execute(self) -> None:
         """Run the action."""
-        VjerStep().log_message(f'Starting {__title__} version {__version__} ({__build_name__}) [{__build_date__}]', True)
         for (category, info) in (yaml_to_dotmap(TOOL_REPORT) if TOOL_REPORT.exists() else tool_reporter()).items():
             VjerStep().log_message(category.replace('_', ' ').title(), True)
             for (name, data) in info.items():

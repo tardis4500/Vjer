@@ -12,18 +12,23 @@ from sys import exit as sys_exit, stderr, version as python_version
 
 # Import third-party modules
 from batcave.commander import Argument, Commander
+from batcave.version import AppVersion, VersionStyle
 
 # Import local modules
-from .utils import apt, apt_install, VJER_ENV, pip_install, ProjectConfig, ConfigurationError, PROJECT_CFG_FILE
+from . import __title__, __version__, __build_name__, __build_date__
+from .utils import apt, apt_install, VJER_ENV, pip_install, ProjectConfig, ConfigurationError, PROJECT_CFG_FILE, VjerStep
 
 ACTIONS = ['test', 'build', 'deploy', 'rollback', 'pre_release', 'release', 'freeze']
 
 
 def main() -> None:
     """The main entrypoint."""
-    args = Commander('Vjer CI/CD Automation Tool', [Argument('actions', choices=ACTIONS, nargs='+')]).parse_args()
+    version = AppVersion(__title__, __version__, __build_date__, __build_name__)
+    args = Commander('Vjer CI/CD Automation Tool', [Argument('actions', choices=ACTIONS, nargs='+')], version=version).parse_args()
+    VjerStep().log_message(version.get_info(VersionStyle.one_line), True)
     _setup_environment()
-    print(f'OS: {platform()}\nPython version: {python_version}')
+    VjerStep().log_message(f'OS: {platform()}')
+    VjerStep().log_message(f'Python version: {python_version}')
 
     _sys_initialize()
     for action in args.actions:
@@ -42,14 +47,14 @@ def _setup_environment() -> None:
     except ConfigurationError as err:
         if err.code != ConfigurationError.CONFIG_FILE_NOT_FOUND.code:
             raise
-        print('The Vjer configuration file was not found:', PROJECT_CFG_FILE, file=stderr)
+        print('ERROR The Vjer configuration file was not found:', PROJECT_CFG_FILE, file=stderr)
         sys_exit(1)
     if (VJER_ENV == 'local') and not getenv('VIRTUAL_ENV', ''):
-        print('Vjer must be run from a virtual environment.', file=stderr)
+        print('ERROR Vjer must be run from a virtual environment.', file=stderr)
         sys_exit(1)
     if hasattr((config := ProjectConfig()).project, 'environment'):
         for (var, val) in config.project.environment.items():
-            print(f'setting {var}={val}')
+            VjerStep().log_message(f'setting {var}={val}')
             os.environ[var] = val  # putenv doesn't work because the values are needed for this process.
 
 

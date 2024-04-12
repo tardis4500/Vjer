@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [32.1.0] - Unreleased
+
+- Changed
+  - Cleanup version output and add --version option. (GitHub #8)
+  - Fix tagging on release. (GitHub #7)
+
+## Release History
+
 ### [32.0.0] - 2024-04-10
 
 - Added
@@ -14,8 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Removed
   - Removed implicit release steps. (GitHub #6)
-
-## Release History
 
 ### [31.0.0] - 2024-03-21
 

@@ -54,7 +54,7 @@ class ReleaseStep(VjerStep):
 
     def release_github(self) -> None:
         """Create a GitHub release."""
-        SysCmdRunner('gh', 'release', 'create', self.version, title=f'Release {self.version}', latest=True, generate_notes=True).run()
+        SysCmdRunner('gh', 'release', 'create', f'v{self.version}', title=f'Release {self.version}', latest=True, generate_notes=True).run()
 
     def release_helm(self) -> None:
         """Perform a release of a Helm chart."""
