@@ -112,8 +112,7 @@ class BuildStep(VjerStep):
     def build_helm(self) -> None:
         """Build method for Helm charts."""
         helm('dependency', 'build', self.helm_chart_root)
-        helm('package', self.helm_chart_root)
-        self.copy_artifact(self.helm_package.name)
+        self.helm_build()
 
 
 def build() -> None:

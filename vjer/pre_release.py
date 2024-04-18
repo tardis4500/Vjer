@@ -5,7 +5,7 @@ from typing import cast
 
 # Import project modules
 from .release import ReleaseStep
-from .utils import VjerAction, VjerStep, helm
+from .utils import VjerAction, VjerStep
 
 
 class PreReleaseStep(ReleaseStep):
@@ -29,11 +29,16 @@ class PreReleaseStep(ReleaseStep):
 
     def release_helm(self) -> None:
         """Pre_release a Helm chart."""
+        self._release_helm()
+        for version in self.step_info.extra_versions:
+            self.project.version = version
+            self._release_helm()
+
+    def _release_helm(self) -> None:
         if self.helm_repo.type == 'oci':
             self.update_version_files()
             try:
-                helm('package', self.helm_chart_root)
-                self.copy_artifact(self.helm_package.name)
+                self.helm_build()
             finally:
                 self.update_version_files(reset=True)
         else:

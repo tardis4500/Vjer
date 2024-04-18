@@ -21,8 +21,11 @@ class ReleaseStep(VjerStep):
     is_pre_release = False
 
     def _execute(self) -> None:
-        if self.is_pre_release and self.step_info.release_only:
+        if self.step_info.release_only and self.is_pre_release:
             self.log_message('Skipping on pre_release')
+            return
+        if self.step_info.pre_release_only and not self.is_pre_release:
+            self.log_message('Skipping on release')
             return
         super()._execute()
 

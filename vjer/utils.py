@@ -445,6 +445,11 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         flit_builder(Path('pyproject.toml'))
         self.copy_artifact('dist')
 
+    def helm_build(self) -> None:
+        """Build a Helm chart."""
+        helm('package', self.helm_chart_root)
+        self.copy_artifact(self.helm_package.name)
+
     def tag_images(self, source_tag: str, tags: list[str]) -> None:
         """Tag Docker images.
 
