@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [33.0.2] - 2024-04-18
+### [33.0.2] - Unreleased
 
 - Added
   - Added integration testing. (GitHub #10)
