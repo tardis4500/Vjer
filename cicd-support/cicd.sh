@@ -34,6 +34,16 @@ function install-pip-tools {
 }
 
 install-pip-tools
+
+if [[ $1 == test-install ]]; then
+    pip install $ARTIFACTS_DIR/*.tar.gz
+    cd tests
+    for test in test build release; do
+        vjer $test
+    done
+    exit
+fi
+
 pip-install virtualenv
 if [[ ! -e $VIRTUAL_ENV ]]; then virtualenv $VIRTUAL_ENV; fi
 source $VIRTUAL_ENV/bin/activate

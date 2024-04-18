@@ -30,7 +30,7 @@ dependencies = [
     "flake8",
     "flake8-annotations",
     "flake8-pyproject",
-    "flit",
+    # "flit",
     "mypy",
     "pylint",
     "unittest-xml-reporting",

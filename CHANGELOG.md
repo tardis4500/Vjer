@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### [33.0.1] - 2024-04-18
 
+- Added
+  - Added integration testing. (GitHub #10)
+
 - Changed
   - Switched flit to be a required module. (GitHub #9)
 
