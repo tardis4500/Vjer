@@ -20,7 +20,7 @@ from typing import Callable, cast, Optional
 
 # Import third-party modules
 from batcave.automation import Action
-from batcave.cloudmgr import Cloud, CloudType
+from batcave.cloudmgr import Cloud, CloudType, gcloud
 from batcave.cms import Client, ClientType
 from batcave.expander import Expander, file_expander
 from batcave.lang import BatCaveError, BatCaveException, PathName, DEFAULT_ENCODING, WIN32, yaml_to_dotmap
@@ -40,10 +40,9 @@ _PROJECT_DEFAULTS = DotMap(build_artifacts='artifacts',
                            chart_root='helm-chart',
                            container_registry=DotMap(type='local', name=''),
                            dockerfile='Dockerfile',
-                           gcp_artifact_region='us',
                            test_results='test_results',
                            version_service=DotMap(type='vjer'))
-_VALID_SCHEMAS = [2]
+_VALID_SCHEMAS = [3]
 
 PROJECT_CFG_FILE = getenv('VJER_CFG', 'vjer.yml')
 TOOL_REPORT = Path(__file__).parent.absolute() / 'tool_report.yml'
@@ -269,11 +268,9 @@ class ProjectConfig():
                                             test_results_dir=self.project.project_root / self.project.test_results))
         if hasattr(self.project, 'artifact_repo'):
             if hasattr(self.project, 'docker_repo'):
-                self.project.update_defaults(DotMap(container_registry=DotMap(type='local',
-                                                                              name=f'{self.project.gcp_artifact_region}-docker.pkg.dev/{self.project.artifact_repo}/{self.project.docker_repo}')))
+                self.project.update_defaults(DotMap(container_registry=DotMap(self.project.docker_repo)))
             if hasattr(self.project, 'helm_repo'):
-                self.project.update_defaults(DotMap(chart_repo=DotMap(type='oci',
-                                                                      name=f'oci://{self.project.gcp_artifact_region}-docker.pkg.dev/{self.project.artifact_repo}/{self.project.helm_repo}')))
+                self.project.update_defaults(DotMap(chart_repo=DotMap(self.project.helm_repo)))
 
     def _set_version(self) -> None:
         match self.project.version_service.type:
@@ -447,6 +444,21 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         """Run a Python flit build."""
         flit_builder(Path('pyproject.toml'))
         self.copy_artifact('dist')
+
+    def tag_images(self, source_tag: str, tags: list[str]) -> None:
+        """Tag Docker images."""
+        if (registry := self.container_registry).type not in ('gcp', 'gcp-art'):
+            (image := self.registry_client.get_image(source_tag)).pull()
+        for tag in tags:
+            self.log_message(f'Tagging image: {tag}')
+            match registry.type:
+                case 'gcp':
+                    gcloud('container', 'images', 'add-tag', source_tag, tag, syscmd_args={'ignore_stderr': True})
+                case 'gcp-art':
+                    gcloud('artifacts', 'docker', 'tags', 'add', source_tag, tag, syscmd_args={'ignore_stderr': True})
+                case  _:
+                    image.tag(tag)
+                    image.push()
 
     def tag_source(self, tag: str, label: Optional[str] = None) -> None:
         """Tag the source in Git.

@@ -4,7 +4,6 @@
 from typing import cast
 
 # Import third-party modules
-from batcave.cloudmgr import gcloud
 from batcave.sysutil import SysCmdRunner
 
 # Import project modules
@@ -34,19 +33,10 @@ class ReleaseStep(VjerStep):
     def release_docker(self) -> None:
         """Perform a release of a Docker image by tagging."""
         self._docker_init()
-        if (registry := self.container_registry).type not in ('gcp', 'jfrog'):
-            (image := self.registry_client.get_image(self.image_tag)).pull()
         default_tags = [self.version_tag.lower()]
         if not self.is_pre_release:
             default_tags.append(f'{self.image_name}:latest'.lower())
-        for tag in self.step_info.tags if self.step_info.tags else default_tags:
-            self.log_message(f'Tagging image: {tag}')
-            match registry.type:
-                case 'gcp':
-                    gcloud('container', 'images', 'add-tag', self.image_tag, tag, syscmd_args={'ignore_stderr': True})
-                case  _:
-                    image.tag(tag)
-                    image.push()
+        self.tag_images(self.image_tag, self.step_info.tags if self.step_info.tags else default_tags)
 
     def release_flit_build(self) -> None:
         """Run a Python flit build."""

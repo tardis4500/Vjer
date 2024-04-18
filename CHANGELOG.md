@@ -7,13 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [33.0.0] - 2024-04-18
+
+- Added
+  - Added support for multiple Docker tags and Helm versions at build. (GitHub #8)
+
+- Changed
+  - Required specification of full Docker and Helm repo info in config file.
+
+## Release History
+
 ### [32.1.0] - 2024-04-11
 
 - Changed
-  - Cleanup version output and add --version option. (GitHub #8)
+  - Cleanup version output and add --version option. (GitHub #5)
   - Fix tagging on release. (GitHub #7)
-
-## Release History
 
 ### [32.0.0] - 2024-04-10
 
