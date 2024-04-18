@@ -266,11 +266,6 @@ class ProjectConfig():
     def _set_defaults(self) -> None:
         self.project.update_defaults(DotMap(artifacts_dir=self.project.project_root / self.project.build_artifacts,
                                             test_results_dir=self.project.project_root / self.project.test_results))
-        if hasattr(self.project, 'artifact_repo'):
-            if hasattr(self.project, 'docker_repo'):
-                self.project.update_defaults(DotMap(container_registry=DotMap(self.project.docker_repo)))
-            if hasattr(self.project, 'helm_repo'):
-                self.project.update_defaults(DotMap(chart_repo=DotMap(self.project.helm_repo)))
 
     def _set_version(self) -> None:
         match self.project.version_service.type:
@@ -355,9 +350,9 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         Returns:
             Nothing.
         """
-        self.registry_client = Cloud(CloudType.gcloud if (self.container_registry.type == 'gcp') else CloudType.local, login=login)
+        self.registry_client = Cloud(CloudType.gcloud if (self.project.container_registry.type == 'gcp') else CloudType.local, login=login)
         self.docker_client = Cloud(CloudType.local)
-        registry_name_path = f'{self.container_registry.name}/' if login else ''
+        registry_name_path = f'{self.project.container_registry.name}/' if login else ''
         self.image_name = f'{registry_name_path}{self.step_info.image if self.step_info.image else self.project.name}'
         self.version_tag = f'{self.image_name}:{self.project.version}'
         self.image_tag = f'{self.version_tag}-{self.build.build_num}'.lower()
@@ -389,12 +384,12 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
     @property
     def helm_repo(self) -> DotMap:
         """A read-only property which returns the Helm repo name with a randomized suffix."""
-        if (self.chart_repo.type != 'oci') and self.chart_repo.url and not self.chart_repo.name:
+        if (self.project.helm_repository.type != 'oci') and self.project.helm_repository.url and not self.project.helm_repository.name:
             repo_name = f'vjer-{randint(0, 100)}'
             helm('repo', 'add', repo_name, self.chart_repo.url)
             helm('repo', 'update')
-            self.chart_repo.name = repo_name
-        return self.chart_repo
+            self.project.helm_repository.name = repo_name
+        return self.project.helm_repository
 
     def commit_files(self, message: str, branch: str, *files, file_updater: Optional[Callable] = None) -> None:
         """Checkin files during to the source repository."""
@@ -460,7 +455,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         Returns:
             Nothing.
         """
-        if (registry := self.container_registry).type not in ('gcp', 'gcp-art'):
+        if (registry := self.project.container_registry).type not in ('gcp', 'gcp-art'):
             (image := self.registry_client.get_image(source_tag)).pull()
         for tag in tags:
             self.log_message(f'Tagging image: {tag}')

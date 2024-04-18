@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
-### [33.0.2] - Unreleased
+### [34.0.0] - 2024-04-18
 
 - Added
   - Added integration testing. (GitHub #10)
+
+- Changed
+  - Remove need to specify artifact_repo in config file. (GitHub #11)
+  - Rename config values docker_repo to container_registry and help_repo to helm_repository.
 
 ## Release History
 
