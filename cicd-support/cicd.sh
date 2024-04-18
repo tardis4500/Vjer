@@ -35,7 +35,7 @@ function install-pip-tools {
 
 install-pip-tools
 
-if [[ $1 == test-install ]]; then
+if [[ $1 == install-test ]]; then
     pip install $ARTIFACTS_DIR/*.tar.gz
     cd tests
     for test in test build release; do
