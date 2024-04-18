@@ -1,5 +1,6 @@
 schema: 3
 project:
   name: vjer-install-test
+  version: 1.0.0
 
 # cSpell:ignore vjer
