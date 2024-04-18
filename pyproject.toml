@@ -30,13 +30,14 @@ dependencies = [
     "flake8",
     "flake8-annotations",
     "flake8-pyproject",
+    "flit",
     "mypy",
     "pylint",
     "unittest-xml-reporting",
 ]
 
 [project.optional-dependencies]
-dev = ["flit", "twine"]
+dev = ["twine"]
 test = ["types-PyYAML", "types-requests"]
 # doc = []
 

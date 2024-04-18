@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [33.0.1] - 2024-04-18
+
+- Changed
+  - Switched flit to be a required module. (GitHub #9)
+
+## Release History
+
 ### [33.0.0] - 2024-04-18
 
 - Added
@@ -14,8 +21,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Changed
   - Required specification of full Docker and Helm repo info in config file.
-
-## Release History
 
 ### [32.1.0] - 2024-04-11
 
