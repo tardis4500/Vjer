@@ -355,7 +355,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         Returns:
             Nothing.
         """
-        self.registry_client = Cloud(CloudType[self.container_registry.type], login=login)
+        self.registry_client = Cloud(CloudType.gcloud if (self.container_registry.type == 'gcp') else CloudType.local, login=login)
         self.docker_client = Cloud(CloudType.local)
         registry_name_path = f'{self.container_registry.name}/' if login else ''
         self.image_name = f'{registry_name_path}{self.step_info.image if self.step_info.image else self.project.name}'
@@ -446,7 +446,15 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         self.copy_artifact('dist')
 
     def tag_images(self, source_tag: str, tags: list[str]) -> None:
-        """Tag Docker images."""
+        """Tag Docker images.
+
+        Args:
+            source_Tag: The tag of the existing image to which to add the new tags.
+            tags: The list of tags to add.
+
+        Returns:
+            Nothing.
+        """
         if (registry := self.container_registry).type not in ('gcp', 'gcp-art'):
             (image := self.registry_client.get_image(source_tag)).pull()
         for tag in tags:

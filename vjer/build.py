@@ -102,8 +102,8 @@ class BuildStep(VjerStep):
         if push_image:
             self.log_message('Pushing image to registry', True)
             self.registry_client.get_image(self.image_tag).push()
-        if self.step_info.tags:
-            self.tag_images(self.image_tag, [f'{self.image_name}:{t}' for t in self.step_info.tags])
+            if self.step_info.tags:
+                self.tag_images(self.image_tag, [f'{self.image_name}:{t}' for t in self.step_info.tags])
 
     def build_flit(self) -> None:
         """Run a Python flit build."""
