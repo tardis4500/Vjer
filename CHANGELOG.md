@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [34.1.0] - 2024-04-19
+
+- Changed
+  - Convert extra Helm versions on pre_release to lowercase. (GitHub #12)
+
+## Release History
+
 ### [34.0.0] - 2024-04-18
 
 - Added
@@ -15,8 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed
   - Remove need to specify artifact_repo in config file. (GitHub #11)
   - Rename config values docker_repo to container_registry and help_repo to helm_repository.
-
-## Release History
 
 ### [33.0.1] - 2024-04-18
 
