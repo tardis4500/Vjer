@@ -31,7 +31,7 @@ class PreReleaseStep(ReleaseStep):
         """Pre_release a Helm chart."""
         self._release_helm()
         for version in self.step_info.extra_versions:
-            self.project.version = version
+            self.project.version = version.lower()
             self._release_helm()
 
     def _release_helm(self) -> None:
