@@ -13,6 +13,7 @@ from batcave.sysutil import syscmd, CMDError
 from dotmap import DotMap
 
 PRODUCTS = [DotMap(name='Docker', regex=re_compile('Docker version (.+)')),
+            DotMap(name='Google Cloud SDK', command='gcloud', regex=re_compile(r'Google Cloud SDK ([\d\.]+) ')),
             DotMap(name='Helm', args=['version'], regex=re_compile(r'Version:"v([\d\.]+)"'))]
 
 

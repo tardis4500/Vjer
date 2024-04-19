@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [34.1.1] - 2024-04-19
+
+- Added
+  - Report the Google SDK version. (GitHub #13)
+
+## Release History
+
 ### [34.1.0] - 2024-04-19
 
 - Changed
   - Convert extra Helm versions on pre_release to lowercase. (GitHub #12)
-
-## Release History
 
 ### [34.0.0] - 2024-04-18
 
