@@ -12,6 +12,7 @@ from datetime import datetime
 from os import getenv
 from pathlib import Path
 from random import randint
+from re import compile as re_compile, sub as re_sub
 from shutil import copy, copyfile, copytree
 from stat import S_IWUSR
 from string import Template
@@ -52,6 +53,9 @@ DEFAULT_VERSION_FILES = {'helm': [HELM_CHART_FILE, 'values.yaml']}
 
 VJER_ENV = getenv('VJER_ENV', 'local')
 REMOTE_REF = 'vjer_origin'
+
+BAD_TAG_CHARACTERS = '? ,.:`"/\\\'*'
+REPLACER_HOLDER = '-'
 
 apt = SysCmdRunner('apt-get', '-y').run
 apt_install = SysCmdRunner('apt-get', '-y', 'install', no_install_recommends=True).run
@@ -458,14 +462,17 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         if (registry := self.project.container_registry).type not in ('gcp', 'gcp-art'):
             (image := self.registry_client.get_image(source_tag)).pull()
         for tag in tags:
-            self.log_message(f'Tagging image: {tag}')
+            (repo, candidate_tag) = tag.split(':', 1) if (':' in tag) else ('', tag)
+            sanitized_tag = sanitize_docker_tag(candidate_tag)
+            final_tag = f'{repo}:{sanitized_tag}' if (':' in tag) else sanitized_tag
+            self.log_message(f'Tagging image: {final_tag}')
             match registry.type:
                 case 'gcp':
-                    gcloud('container', 'images', 'add-tag', source_tag, tag, syscmd_args={'ignore_stderr': True})
+                    gcloud('container', 'images', 'add-tag', source_tag, final_tag, syscmd_args={'ignore_stderr': True})
                 case 'gcp-art':
-                    gcloud('artifacts', 'docker', 'tags', 'add', source_tag, tag, syscmd_args={'ignore_stderr': True})
+                    gcloud('artifacts', 'docker', 'tags', 'add', source_tag, final_tag, syscmd_args={'ignore_stderr': True})
                 case  _:
-                    image.tag(tag)
+                    image.tag(final_tag)
                     image.push()
 
     def tag_source(self, tag: str, label: Optional[str] = None) -> None:
@@ -573,5 +580,25 @@ class VjerAction:  # pylint: disable=too-few-public-methods
             (executor := cast(Callable, self.action_step_class)()).step_info = step
             executor.execute()
             is_first_step = False
+
+
+def sanitize_docker_tag(tag: str, replacement_char: str = '-') -> str:
+    """Sanitize a Docker tag by replacing invalid characters with a specified valid character.
+
+        Args:
+            tag: The Docker tag to sanitize.
+            replacement_char (optional, default=_): The character to replace invalid characters with.
+
+        Returns:
+            The sanitized Docker tag.
+    """
+    valid_pattern = re_compile(r'^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$')
+    sanitized_tag = re_sub(r'[^a-zA-Z0-9._-]', replacement_char, tag)
+    if sanitized_tag[0] in ['.', '-']:
+        sanitized_tag = replacement_char + sanitized_tag[1:]
+    sanitized_tag = sanitized_tag[:128]
+    if not valid_pattern.match(sanitized_tag):
+        raise ValueError(f"The sanitized tag '{sanitized_tag}' is still not valid according to Docker's specifications.")
+    return sanitized_tag
 
 # cSpell:ignore batcave bumpver cloudmgr dotmap platarch syscmd vjer checkin
