@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [36.0.0] - 2024-04-25
+
+- Changed
+  - Don't replace periods in tags. (GitHub #16)
+
+## Release History
+
 ### [35.0.0] - 2024-04-25
 
 - Changed
   - Remove bad characters for Helm versions. (GitHub #15)
-
-## Release History
 
 ### [34.2.0] - 2024-04-22
 

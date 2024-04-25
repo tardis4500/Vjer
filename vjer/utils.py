@@ -592,9 +592,9 @@ def sanitize_tag(tag: str, replacement_char: str = '-') -> str:
         Returns:
             The sanitized Docker tag.
     """
-    valid_pattern = re_compile(r'^[a-zA-Z0-9][a-zA-Z0-9-]{0,127}$')
-    sanitized_tag = re_sub(r'[^a-zA-Z0-9-]', replacement_char, tag)
-    if sanitized_tag[0] == '-':
+    valid_pattern = re_compile(r'^[a-zA-Z0-9][a-zA-Z0-9.-]{0,127}$')
+    sanitized_tag = re_sub(r'[^a-zA-Z0-9.-]', replacement_char, tag)
+    if sanitized_tag[0] in ['.', '-']:
         sanitized_tag = replacement_char + sanitized_tag[1:]
     sanitized_tag = sanitized_tag[:128]
     if not valid_pattern.match(sanitized_tag):
