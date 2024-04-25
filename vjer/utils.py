@@ -463,7 +463,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
             (image := self.registry_client.get_image(source_tag)).pull()
         for tag in tags:
             (repo, candidate_tag) = tag.split(':', 1) if (':' in tag) else ('', tag)
-            sanitized_tag = sanitize_docker_tag(candidate_tag)
+            sanitized_tag = sanitize_tag(candidate_tag)
             final_tag = f'{repo}:{sanitized_tag}' if (':' in tag) else sanitized_tag
             self.log_message(f'Tagging image: {final_tag}')
             match registry.type:
@@ -582,7 +582,7 @@ class VjerAction:  # pylint: disable=too-few-public-methods
             is_first_step = False
 
 
-def sanitize_docker_tag(tag: str, replacement_char: str = '-') -> str:
+def sanitize_tag(tag: str, replacement_char: str = '-') -> str:
     """Sanitize a Docker tag by replacing invalid characters with a specified valid character.
 
         Args:
@@ -592,9 +592,9 @@ def sanitize_docker_tag(tag: str, replacement_char: str = '-') -> str:
         Returns:
             The sanitized Docker tag.
     """
-    valid_pattern = re_compile(r'^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$')
-    sanitized_tag = re_sub(r'[^a-zA-Z0-9._-]', replacement_char, tag)
-    if sanitized_tag[0] in ['.', '-']:
+    valid_pattern = re_compile(r'^[a-zA-Z0-9][a-zA-Z0-9-]{0,127}$')
+    sanitized_tag = re_sub(r'[^a-zA-Z0-9-]', replacement_char, tag)
+    if sanitized_tag[0] == '-':
         sanitized_tag = replacement_char + sanitized_tag[1:]
     sanitized_tag = sanitized_tag[:128]
     if not valid_pattern.match(sanitized_tag):

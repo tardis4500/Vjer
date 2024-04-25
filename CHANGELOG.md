@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [35.0.0] - 2024-04-25
+
+- Changed
+  - Remove bad characters for Helm versions. (GitHub #15)
+
+## Release History
+
 ### [34.2.0] - 2024-04-22
 
 - Changed
   - Sanitize Docker tags and Helm versions. (GitHub #14)
-
-## Release History
 
 ### [34.1.1] - 2024-04-19
 

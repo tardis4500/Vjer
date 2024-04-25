@@ -5,7 +5,7 @@ from typing import cast
 
 # Import project modules
 from .release import ReleaseStep
-from .utils import sanitize_docker_tag, VjerAction, VjerStep
+from .utils import sanitize_tag, VjerAction, VjerStep
 
 
 class PreReleaseStep(ReleaseStep):
@@ -31,7 +31,7 @@ class PreReleaseStep(ReleaseStep):
         """Pre_release a Helm chart."""
         self._release_helm()
         for version in self.step_info.extra_versions:
-            self.project.version = sanitize_docker_tag(version).lower()
+            self.project.version = sanitize_tag(version).lower()
             self._release_helm()
 
     def _release_helm(self) -> None:
