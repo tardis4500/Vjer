@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [36.1.0] - 2024-05-04
+
+- Changed
+  - Move build script into Vjer bootstrap. (GitHub #17)
+
+## Release History
+
 ### [36.0.0] - 2024-04-25
 
 - Changed
   - Don't replace periods in tags. (GitHub #16)
-
-## Release History
 
 ### [35.0.0] - 2024-04-25
 
