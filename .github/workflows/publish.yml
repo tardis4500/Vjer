@@ -16,6 +16,7 @@ env:
   GIT_AUTHOR_NAME: "${{ github.triggering_actor }}"
   GIT_AUTHOR_EMAIL: "${{ github.triggering_actor }}@users.noreply.github.com"
   PYTHON_BUILD_VER: "3.11"
+  VJER_ENV: development
 
 jobs:
   pre_release:

@@ -11,6 +11,7 @@ env:
   ARTIFACTS_DIR: artifacts
   PYTHON_BUILD_VER: "3.11"
   UNIT_TEST_DIR: unit_test_results
+  VJER_ENV: development
 
 jobs:
   test:
