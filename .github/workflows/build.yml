@@ -69,17 +69,19 @@ jobs:
       - uses: actions/download-artifact@v4
       - run: |
           set -eu
-          pip install $ARTIFACTS_DIR/*.tar.gz
+          pip install $ARTIFACTS_DIR/*.whl
           cd tests
           for test in test build release; do
               vjer $test
           done
         if: matrix.os != 'windows-latest'
       - run: |
-          pip install $env:ARTIFACTS_DIR\*.tar.gz
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          pip install (Get-Item $env:ARTIFACTS_DIR\*.whl)
           Set-Location tests
           foreach ($test in @('test', 'build', 'release')) {
-              python -m vjer $test }
+              vjer $test }
         if: matrix.os == 'windows-latest'
 
   show-run-id:
