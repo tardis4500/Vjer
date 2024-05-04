@@ -74,7 +74,13 @@ jobs:
           for test in test build release; do
               vjer $test
           done
-          exit
+        if: matrix.os != 'windows-latest'
+      - run: |
+          pip install $ARTIFACTS_DIR/*.tar.gz
+          Set-Location tests
+          foreach ($test in @('test', 'build', 'release')) {
+              vjer $test }
+        if: matrix.os == 'windows-latest'
 
   show-run-id:
     runs-on: ubuntu-latest
