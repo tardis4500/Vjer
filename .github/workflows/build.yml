@@ -79,7 +79,7 @@ jobs:
           pip install $ARTIFACTS_DIR/*.tar.gz
           Set-Location tests
           foreach ($test in @('test', 'build', 'release')) {
-              vjer $test }
+              python -m vjer $test }
         if: matrix.os == 'windows-latest'
 
   show-run-id:
