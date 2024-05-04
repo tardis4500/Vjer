@@ -76,7 +76,7 @@ jobs:
           done
         if: matrix.os != 'windows-latest'
       - run: |
-          pip install $ARTIFACTS_DIR/*.tar.gz
+          pip install $env:ARTIFACTS_DIR\*.tar.gz
           Set-Location tests
           foreach ($test in @('test', 'build', 'release')) {
               python -m vjer $test }
