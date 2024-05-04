@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
-      - run: flit install -s --deps all && vjer "${{ github.job }}"
+      - run: pip install flit && flit install -s --deps all && vjer "${{ github.job }}"
 
   build:
     needs:
@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_BUILD_VER }}
           cache: "pip"
-      - run: flit install -s --deps all && vjer "${{ github.job }}"
+      - run: pip install flit && flit install -s --deps all && vjer "${{ github.job }}"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACTS_DIR }}
