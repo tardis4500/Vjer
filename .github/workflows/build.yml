@@ -27,11 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
-      - uses: actions/cache@v3
-        with:
-          path: ${{ env.VIRTUAL_ENV }}
-          key: pip-${{ runner.os }}-${{ matrix.python-version }}
-      - run: cicd-support/cicd.sh "${{ github.job }}"
+      - run: flit install -s --deps all && vjer "${{ github.job }}"
 
   build:
     needs:
@@ -43,11 +39,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_BUILD_VER }}
           cache: "pip"
-      - uses: actions/cache@v3
-        with:
-          path: ${{ env.VIRTUAL_ENV }}
-          key: pip-${{ runner.os }}-${{ env.PYTHON_BUILD_VER }}
-      - run: cicd-support/cicd.sh "${{ github.job }}"
+      - run: flit install -s --deps all && vjer "${{ github.job }}"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACTS_DIR }}
@@ -56,13 +48,25 @@ jobs:
   install-test:
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.11"
+          - "3.12"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_BUILD_VER }}
       - uses: actions/download-artifact@v4
-      - run: cicd-support/cicd.sh "${{ github.job }}"
+      - run: |
+          set -eu
+          pip install $ARTIFACTS_DIR/*.tar.gz
+          cd tests
+          for test in test build release; do
+              vjer $test
+          done
+          exit
 
   show-run-id:
     runs-on: ubuntu-latest

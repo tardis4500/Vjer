@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -eu
+set -e
 
+source $VIRTUALENVWRAPPER_SCRIPT
 mkvirtualenv vjer
 python -m pip install --upgrade pip
 pip install --upgrade --upgrade-strategy eager setuptools wheel
