@@ -79,7 +79,7 @@ jobs:
       - run: |
           $ErrorActionPreference = 'Stop'
           Set-StrictMode -Version Latest
-          pip install (Get-Item $env:ARTIFACTS_DIR\*.whl)
+          pip install (Get-Item $env:ARTIFACTS_DIR\*.whl); git-stream list
           Set-Location tests
           foreach ($test in @('test', 'build', 'release')) {
               vjer $test }
