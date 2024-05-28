@@ -37,7 +37,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["twine"]
+# dev = []
 test = ["types-PyYAML", "types-requests"]
 # doc = []
 
