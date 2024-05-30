@@ -25,7 +25,7 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-    uses: tardis4500/shared-actions/test.yml
+    uses: tardis4500/shared-actions/test.yml@main
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
