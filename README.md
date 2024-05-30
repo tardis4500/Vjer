@@ -1,6 +1,6 @@
 # Vjer Python Module
 
-A module for automating CI/CD tasks.
+A command line tool for automating CI/CD tasks.
 
 ## Developing
 

@@ -1,3 +1,3 @@
 # Vjer Python Module
 
-A module for supporting CI/CD actions.
+A command line tool for automating CI/CD tasks.
