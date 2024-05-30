@@ -16,7 +16,6 @@ env:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os:
@@ -26,13 +25,10 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-      - run: pip install vjer && vjer "${{ github.job }}"
+    uses: tardis4500/shared-actions/test.yml
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
 
   build:
     needs:
