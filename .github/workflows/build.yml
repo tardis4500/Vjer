@@ -38,7 +38,7 @@ jobs:
     with:
       action: build
       os: ubuntu-latest
-      python-version: ${{ env.PYTHON_BUILD_VER }}
+      python-version: "3.11"
 
   install-test:
     needs: build
