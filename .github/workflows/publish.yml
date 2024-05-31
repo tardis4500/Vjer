@@ -24,6 +24,7 @@ jobs:
       use-local-vjer: true
 
   release:
+    needs: pre_release
     uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
     with:
       environment: Production
