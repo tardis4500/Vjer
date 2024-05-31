@@ -8,8 +8,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARTIFACTS_DIR: artifacts
   PYTHON_BUILD_VER: "3.11"
+  ARTIFACTS_DIR: artifacts
   UNIT_TEST_DIR: unit_test_results
   VJER_ENV: development
   VJER_USE_FLIT: true
@@ -34,18 +34,11 @@ jobs:
   build:
     needs:
       - test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_BUILD_VER }}
-          cache: "pip"
-      - run: pip install vjer && vjer "${{ github.job }}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACTS_DIR }}
-          path: ${{ env.ARTIFACTS_DIR }}
+    uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
+    with:
+      action: build
+      os: ubuntu-latest
+      python-version: ${{ env.PYTHON_BUILD_VER }}
 
   install-test:
     needs: build
