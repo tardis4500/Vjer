@@ -7,9 +7,6 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-env:
-  PYTHON_BUILD_VER: "3.11"
-
 jobs:
   test:
     uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
@@ -53,5 +50,3 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-
-# cSpell:ignore vjer tardis
