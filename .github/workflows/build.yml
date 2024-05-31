@@ -46,7 +46,7 @@ jobs:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
       test-action: "vjer test build release"
-      test-dir: test
+      test-dir: tests
     strategy:
       matrix:
         os:
