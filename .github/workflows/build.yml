@@ -16,8 +16,9 @@ env:
 
 jobs:
   test:
-    uses: tardis4500/shared-actions/.github/workflows/test.yml@main
+    uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
     with:
+      action: test
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
     strategy:
