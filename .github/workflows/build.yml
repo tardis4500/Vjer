@@ -9,10 +9,6 @@ concurrency:
 
 env:
   PYTHON_BUILD_VER: "3.11"
-  ARTIFACTS_DIR: artifacts
-  UNIT_TEST_DIR: unit_test_results
-  VJER_ENV: development
-  VJER_USE_FLIT: true
 
 jobs:
   test:
@@ -57,4 +53,4 @@ jobs:
           - "3.11"
           - "3.12"
 
-# cSpell:ignore vjer venv tardis
+# cSpell:ignore vjer tardis
