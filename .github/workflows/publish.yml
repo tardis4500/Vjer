@@ -11,6 +11,10 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   pre_release:
     uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
