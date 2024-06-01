@@ -18,8 +18,8 @@ permissions:
 jobs:
   pre_release:
     uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
+    secrets: inherit
     with:
-      artifact-token: ${{ secrets.ARTIFACT_TOKEN }}
       environment: Staging
       publish-mode: pre_release
       run-id: ${{ inputs.run-id }}
@@ -28,8 +28,8 @@ jobs:
   release:
     needs: pre_release
     uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
+    secrets: inherit
     with:
-      artifact-token: ${{ secrets.ARTIFACT_TOKEN }}
       environment: Production
       publish-mode: release
       run-id: ${{ inputs.run-id }}
