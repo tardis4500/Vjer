@@ -17,8 +17,9 @@ permissions:
 
 jobs:
   pre_release:
-    uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
-    secrets: inherit
+    uses: ./.github/workflows/pypi-publish.yml
+    # uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
+    # secrets: inherit
     with:
       environment: Staging
       publish-mode: pre_release
@@ -27,8 +28,9 @@ jobs:
 
   release:
     needs: pre_release
-    uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
-    secrets: inherit
+    uses: ./.github/workflows/pypi-publish.yml
+    # uses: tardis4500/shared-actions/.github/workflows/pypi-publish.yml@main
+    # secrets: inherit
     with:
       environment: Production
       publish-mode: release
