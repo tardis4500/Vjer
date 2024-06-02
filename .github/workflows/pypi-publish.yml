@@ -24,6 +24,7 @@ on:
 env:
   ARTIFACTS_DIR: artifacts
   GH_TOKEN: ${{ github.token }}
+  VJER_ENV: development
 
 jobs:
   pypi-publish:
