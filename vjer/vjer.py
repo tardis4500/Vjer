@@ -44,7 +44,7 @@ def main() -> None:
 
 
 def _pip_setup() -> None:
-    SysCmdRunner('python', 'install', '-m', 'pip', quiet=True, no_cache_dir=True, upgrade=True).run()
+    SysCmdRunner('python', '-m', 'pip', 'install', 'pip', quiet=True, no_cache_dir=True, upgrade=True).run()
     pip_install('setuptools', 'wheel')
 
 
