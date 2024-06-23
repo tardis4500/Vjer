@@ -7,16 +7,14 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-env:
-  ARTIFACTS_DIR: artifacts
-  PYTHON_BUILD_VER: "3.11"
-  UNIT_TEST_DIR: unit_test_results
-  VJER_ENV: development
-  VJER_USE_FLIT: true
-
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
+    with:
+      action: test
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      vjer-local: true
     strategy:
       matrix:
         os:
@@ -26,33 +24,25 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-      - run: pip install vjer && vjer "${{ github.job }}"
 
   build:
-    needs:
-      - test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_BUILD_VER }}
-          cache: "pip"
-      - run: pip install vjer && vjer "${{ github.job }}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACTS_DIR }}
-          path: ${{ env.ARTIFACTS_DIR }}
+    needs: test
+    uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
+    with:
+      action: build
+      os: ubuntu-latest
+      python-version: "3.11"
+      use-flit: true
+      vjer-local: true
 
   install-test:
     needs: build
-    runs-on: ${{ matrix.os }}
+    uses: tardis4500/shared-actions/.github/workflows/install-test.yml@main
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      test-action: "vjer test build release"
+      test-dir: tests
     strategy:
       matrix:
         os:
@@ -62,32 +52,3 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_BUILD_VER }}
-      - uses: actions/download-artifact@v4
-      - run: |
-          set -eu
-          pip install $ARTIFACTS_DIR/*.whl
-          cd tests
-          for test in test build release; do
-              vjer $test
-          done
-        if: matrix.os != 'windows-latest'
-      - run: |
-          $ErrorActionPreference = 'Stop'
-          Set-StrictMode -Version Latest
-          pip install (Get-Item $env:ARTIFACTS_DIR\*.whl); git-stream list
-          Set-Location tests
-          foreach ($test in @('test', 'build', 'release')) {
-              vjer $test }
-        if: matrix.os == 'windows-latest'
-
-  show-run-id:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo ${{ github.run_id }}
-
-# cSpell:ignore vjer venv
