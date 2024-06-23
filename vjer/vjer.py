@@ -14,6 +14,7 @@ from sys import exit as sys_exit, stderr, version as python_version
 # Import third-party modules
 from batcave.commander import Argument, Commander
 from batcave.fileutil import slurp
+from batcave.sysutil import SysCmdRunner
 from batcave.version import AppVersion, VersionStyle
 from flit.install import Installer
 
@@ -43,7 +44,7 @@ def main() -> None:
 
 
 def _pip_setup() -> None:
-    pip_install('pip')
+    SysCmdRunner('python', '-m', 'pip', 'install', quiet=True, no_cache_dir=True, upgrade=True).run()
     pip_install('setuptools', 'wheel')
 
 
