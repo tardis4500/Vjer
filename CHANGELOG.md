@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [36.1.3] - 2024-07-06
+
+- Test release, no changes.
+
+## Release History
+
 ### [36.1.2] - 2024-06-23
 
 - Changed
   - Use re-usable workflows. (GitHub #18)
   - Fix pip upgrade. (GitHub #19)
-
-## Release History
 
 ### [36.1.1] - Skipped
 
