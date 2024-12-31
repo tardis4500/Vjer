@@ -1,7 +1,7 @@
 """This module provides pre_release actions."""
 
 # Import standard modules
-from typing import cast
+from typing import cast, override
 
 # Import project modules
 from .release import ReleaseStep
@@ -21,12 +21,14 @@ class PreReleaseStep(ReleaseStep):
         super().__init__()
         self.project.version = f'{self.project.version}-{self.pre_release_num}'
 
+    @override
     def release_bumpver(self) -> None:
         """Perform a bumpver on release."""
         if not self.step_info.args:
             self.step_info.args = {'tag-num': True}
         super().release_bumpver()
 
+    @override
     def release_helm(self) -> None:
         """Pre_release a Helm chart."""
         self._release_helm()

@@ -17,7 +17,7 @@ from shutil import copy, copyfile, copytree
 from stat import S_IWUSR
 from string import Template
 from sys import exit as sys_exit, stderr
-from typing import Callable, cast, Optional
+from typing import Callable, cast, Optional, override
 
 # Import third-party modules
 from batcave.automation import Action
@@ -123,7 +123,7 @@ class GitClient(Environment):
         return False
 
 
-class ConfigSection():
+class ConfigSection:
     """Base class to manage configuration sections."""
 
     def __init__(self, **defaults):
@@ -202,7 +202,7 @@ class ConfigSection():
         self._defaults |= values
 
 
-class ProjectConfig():
+class ProjectConfig:
     """Stores project related configuration items."""
 
     def __init__(self):
@@ -361,6 +361,7 @@ class VjerStep(Action):  # pylint: disable=too-many-instance-attributes
         self.version_tag = f'{self.image_name}:{self.project.version}'
         self.image_tag = f'{self.version_tag}-{self.build.build_num}'.lower()
 
+    @override
     def _execute(self) -> None:
         """This method is called by the Action super class when this class's execute method is called."""
         class_name = type(self).__name__.lower().removeprefix('pre').removesuffix('step')
