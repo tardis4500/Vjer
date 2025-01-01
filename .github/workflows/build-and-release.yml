@@ -1,0 +1,146 @@
+name: Vjer  Build and Release
+run-name: Vjer  Build and Release - ${{ github.run_id }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/*
+      - release/*
+  pull_request:
+    branches:
+      - main
+      - feature/*
+      - release/*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UNIT_TEST_DIR: test_results
+  ARTIFACTS_DIR: artifacts
+  VJER_ENV: development
+
+jobs:
+  test:
+    uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
+    with:
+      action: test
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      vjer-local: true
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        python-version:
+          - "3.12"
+          - "3.13"
+
+  build:
+    needs: test
+    uses: tardis4500/shared-actions/.github/workflows/vjer.yml@main
+    with:
+      action: build
+      os: ubuntu-latest
+      python-version: "3.12"
+      use-flit: true
+      vjer-local: true
+
+  install-test:
+    needs: build
+    uses: tardis4500/shared-actions/.github/workflows/install-test.yml@main
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      test-action: "vjer test build release"
+      test-dir: tests
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        python-version:
+          - "3.12"
+          - "3.13"
+
+  pre_release:
+    needs: install-test
+    if: (github.event_name != 'pull_request') && ((github.ref_name == 'main') || startsWith(github.ref_name, 'release/'))
+    permissions:
+      contents: write
+      id-token: write
+    runs-on: ubuntu-latest
+    environment: pre_release
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: Install local vjer
+        run: pip install $ARTIFACTS_DIR/*.whl
+      - name: Prepare Git
+        run: |
+          git config user.name "${{ github.triggering_actor }}"
+          git config user.email "${{ github.triggering_actor }}@users.noreply.github.com"
+          git pull
+      - name: Publish to Test PyPi
+        uses: pypa/gh-action-pypi-publish@v1.12.3
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: ${{ env.ARTIFACTS_DIR }}
+      - name: Run post-publish steps
+        run: vjer pre_release
+
+  release:
+    needs: pre_release
+    if: (github.event_name != 'pull_request') && ((github.ref_name == 'main') || startsWith(github.ref_name, 'release/'))
+    permissions:
+      contents: write
+      id-token: write
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: Install local vjer
+        run: pip install $ARTIFACTS_DIR/*.whl
+      - name: Prepare Git
+        run: |
+          git config user.name "${{ github.triggering_actor }}"
+          git config user.email "${{ github.triggering_actor }}@users.noreply.github.com"
+          git pull
+      - name: Run post-publish steps
+        run: vjer release
+      - name: Publish to PyPi
+        uses: pypa/gh-action-pypi-publish@v1.12.3
+        with:
+          packages-dir: ${{ env.ARTIFACTS_DIR }}
+      - name: Upload released artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACTS_DIR }}-released
+          path: ${{ env.ARTIFACTS_DIR }}
+
+# cSpell:ignore pypa

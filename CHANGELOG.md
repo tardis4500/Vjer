@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Current Release
 
+### [37.0.0] - 2025-01-01
+
+- Changed
+  - Upgraded to Python 2.13. (GitHub #22)
+
+## Release History
+
 ### [36.1.3] - 2024-07-06
 
 - Test release, no changes.
-
-## Release History
 
 ### [36.1.2] - 2024-06-23
 
