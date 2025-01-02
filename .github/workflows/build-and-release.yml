@@ -19,8 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  UNIT_TEST_DIR: test_results
   ARTIFACTS_DIR: artifacts
+  GH_TOKEN: ${{ github.token }}
   VJER_ENV: development
 
 jobs:
