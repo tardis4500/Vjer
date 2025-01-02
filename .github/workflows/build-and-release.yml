@@ -89,8 +89,8 @@ jobs:
           cache: "pip"
       - name: Download artifacts
         uses: actions/download-artifact@v4
-      - name: Install local vjer
-        run: pip install $ARTIFACTS_DIR/*.whl
+      - name: Install vjer
+        run: pip install vjer
       - name: Prepare Git
         run: |
           git config user.name "${{ github.triggering_actor }}"
@@ -122,10 +122,8 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-      - name: Install local vjer
-        run: pip install $ARTIFACTS_DIR/*.whl
+      - name: Install vjer
+        run: pip install vjer
       - name: Prepare Git
         run: |
           git config user.name "${{ github.triggering_actor }}"
